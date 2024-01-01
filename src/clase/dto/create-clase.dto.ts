@@ -1,7 +1,9 @@
+import { Turno } from '../entities/clase.entity';
+
 export class CreateClaseDto {
   nombre: string;
   descripcion: string;
-  id_profesor: number;
+  idProfesor: string;
   asignaturas: string[];
-  turnos: Record<string, string>;
+  turnos: Turno[];
 }

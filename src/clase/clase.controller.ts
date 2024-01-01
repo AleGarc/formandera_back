@@ -7,36 +7,36 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ClasesService } from './clases.service';
+import { ClaseService } from './clase.service';
 import { CreateClaseDto } from './dto/create-clase.dto';
 import { UpdateClaseDto } from './dto/update-clase.dto';
 
-@Controller('clases')
-export class ClasesController {
-  constructor(private readonly clasesService: ClasesService) {}
+@Controller('clase')
+export class ClaseController {
+  constructor(private readonly claseService: ClaseService) {}
 
   @Post()
   create(@Body() createClaseDto: CreateClaseDto) {
-    return this.clasesService.create(createClaseDto);
+    return this.claseService.create(createClaseDto);
   }
 
-  @Get()
+  /*   @Get()
   findAll() {
-    return this.clasesService.findAll();
-  }
+    return this.claseService.findAll();
+  } */
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.clasesService.findOne(+id);
+    return this.claseService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateClaseDto: UpdateClaseDto) {
-    return this.clasesService.update(+id, updateClaseDto);
+    return this.claseService.update(id, updateClaseDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.clasesService.remove(+id);
+    return this.claseService.remove(id);
   }
 }
