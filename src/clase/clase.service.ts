@@ -5,7 +5,7 @@ import { ClaseRepository } from './clase.repository';
 import { Clase } from './entities/clase.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ErrorFormandera } from 'src/base/error';
-import { GetClaseDto } from './dto/get-clase.dto';
+import { ClaseDto } from './dto/clase.dto';
 
 @Injectable()
 export class ClaseService {
@@ -48,7 +48,8 @@ export class ClaseService {
 
   async findOne(id: string) {
     const claseDB = await this.claseRepository.get(id);
-    return new GetClaseDto(claseDB);
+    //mover esto al controlador
+    return new ClaseDto(claseDB);
   }
 
   update(id: string, updateClaseDto: UpdateClaseDto) {

@@ -1,6 +1,6 @@
 import { Turno } from '../entities/clase.entity';
 
-export class GetClaseDto {
+export class ClaseDto {
   idPublico?: string;
   nombre: string;
   descripcion: string;

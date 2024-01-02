@@ -17,6 +17,7 @@ export class ClaseController {
 
   @Post()
   create(@Body() createClaseDto: CreateClaseDto) {
+    //pasar de dto a dominio
     return this.claseService.create(createClaseDto);
   }
 
