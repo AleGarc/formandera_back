@@ -2,8 +2,9 @@ import { HydratedDocument, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AlumnoMongoModel, DocenteMongoModel } from './usuario.schema';
 import { UsuarioRepository } from './usuario.repository';
-import { Usuario } from './entities/usuario.entity';
+import { Usuario, UsuarioUpdate } from './entities/usuario.entity';
 import { Role } from './roles/role.enum';
+import { ErrorFormanderaNotFound } from 'src/base/error';
 
 export class UsuarioRepositoryMongo extends UsuarioRepository {
   constructor(
@@ -17,7 +18,6 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
 
   async create(item: Usuario): Promise<Usuario> {
     let createdUsuarioMongo: any;
-    console.log(item);
     switch (item.role) {
       case Role.Alumno: {
         createdUsuarioMongo = await this.alumnoModel.create(item);
@@ -61,31 +61,37 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     return alumnosMongo.map((alumnoMongo) => this.toUsuarioDomain(alumnoMongo));
   }
 
-  async update(id: string, item: Usuario): Promise<Usuario> {
-    const oldUsuarioMongo = await this.alumnoModel
-      .findByIdAndUpdate(id, item)
-      .exec();
+  async update(id: string, item: UsuarioUpdate): Promise<Usuario> {
+    const newUsuario = await this.alumnoModel.findOneAndUpdate(
+      { idPublico: id },
+      item,
+      { new: true },
+    );
 
-    const newUsuario = new Usuario({
-      ...item,
-      _idDB: oldUsuarioMongo._id.toString(),
-    });
-
-    return newUsuario;
+    return this.toUsuarioDomain(newUsuario);
   }
 
   async delete(id: string): Promise<Usuario> | never {
     const alumno = await this.get(id);
     if (alumno === undefined)
-      throw new Error(`No existe la alumno con id ${id}`);
+      throw new ErrorFormanderaNotFound(`No existe el usuario con id ${id}`);
     else {
       await this.alumnoModel.findOneAndDelete({ idPublico: id }).exec();
       return alumno;
     }
   }
 
-  async getByName(name: string): Promise<Usuario> {
-    const alumnoMongo = await this.alumnoModel.findOne({ name: name }).exec();
-    return this.toUsuarioDomain(alumnoMongo);
+  async getByEmail(email: string): Promise<Usuario> | never {
+    const usuarioMongo = await this.alumnoModel
+      .findOne({ email: email })
+      .exec();
+
+    if (usuarioMongo === null) {
+      throw new ErrorFormanderaNotFound(
+        `No existe el usuario con email ${email}`,
+      );
+    } else {
+      return this.toUsuarioDomain(usuarioMongo);
+    }
   }
 }

@@ -1,9 +1,15 @@
-export class ErrorFormandera {
-  codigo: string;
-  mensaje: string;
+export class ErrorFormandera extends Error {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, ErrorFormandera.prototype);
+  }
+}
 
-  constructor({ codigo, mensaje }: { codigo: string; mensaje: string }) {
-    this.codigo = codigo;
-    this.mensaje = mensaje;
+export class ErrorFormanderaNotFound extends ErrorFormandera {
+  codigo: number;
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, ErrorFormanderaNotFound.prototype);
+    this.codigo = 404;
   }
 }

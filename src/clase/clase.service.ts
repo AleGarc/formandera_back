@@ -13,33 +13,18 @@ export class ClaseService {
     @Inject(ClaseRepository) private claseRepository: ClaseRepository,
   ) {}
   create(createClaseDto: CreateClaseDto) {
-    try {
-      if (!createClaseDto.nombre)
-        throw new Error('No se puede crear una clase sin nombre');
-      if (!createClaseDto.descripcion)
-        throw new Error('No se puede crear una clase sin descripcion');
-      if (!createClaseDto.idProfesor)
-        throw new Error('No se puede crear una clase sin idProfesor');
-      if (createClaseDto.asignaturas.length === 0)
-        throw new Error('No se puede crear una clase sin asignaturas');
-      if (createClaseDto.turnos.length === 0)
-        throw new Error('No se puede crear una clase sin turnos');
-
-      const clase = new Clase({
-        idPublico: uuidv4(),
-        ...createClaseDto,
-        metadatos: {
-          createdBy: createClaseDto.idProfesor,
-          createdAt: new Date().toISOString(),
-          updatedBy: '',
-          updatedAt: '',
-        },
-      });
-      this.claseRepository.create(clase);
-      return clase.idPublico;
-    } catch (error) {
-      return new ErrorFormandera({ codigo: '400', mensaje: error.message });
-    }
+    const clase = new Clase({
+      idPublico: uuidv4(),
+      ...createClaseDto,
+      metadatos: {
+        createdBy: createClaseDto.idProfesor,
+        createdAt: new Date().toISOString(),
+        updatedBy: '',
+        updatedAt: '',
+      },
+    });
+    this.claseRepository.create(clase);
+    return clase.idPublico;
   }
 
   findAll() {
@@ -61,7 +46,8 @@ export class ClaseService {
     try {
       await this.claseRepository.delete(id);
     } catch (error) {
-      return new ErrorFormandera({ codigo: '404', mensaje: error.message });
+      //Esto se hace en el repositorio
+      //return new ErrorFormandera({ codigo: '404', mensaje: error.message });
     }
   }
 }

@@ -5,13 +5,24 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ClaseModule } from './clase/clase.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/formandera'),
+    MongooseModule.forRootAsync({
+      useFactory: async () => ({
+        uri: `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DB}`,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }),
+    }),
+
     ClaseModule,
     UsuarioModule,
     AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

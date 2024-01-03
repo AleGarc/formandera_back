@@ -10,10 +10,13 @@ export class AlumnoMongoModel {
   idPublico: string;
 
   @Prop({ required: true })
-  nombre: string;
+  username: string;
 
   @Prop({ required: true })
-  apellidos: string;
+  nombre: string;
+
+  @Prop({ required: false })
+  biografia: string;
 
   @Prop({ required: true })
   email: string;
@@ -41,10 +44,13 @@ export class DocenteMongoModel {
   idPublico: string;
 
   @Prop({ required: true })
-  nombre: string;
+  username: string;
 
   @Prop({ required: true })
-  apellidos: string;
+  nombre: string;
+
+  @Prop({ required: false })
+  biografia: string;
 
   @Prop({ required: true })
   email: string;
@@ -62,7 +68,7 @@ export class DocenteMongoModel {
   asignaturas: string[];
 
   @Prop({ required: false })
-  horario: string;
+  clase: string;
 }
 
 export const DocenteSchema = SchemaFactory.createForClass(DocenteMongoModel);

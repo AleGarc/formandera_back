@@ -1,11 +1,13 @@
 import { Metadatos } from 'src/base/metadatos';
 import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { Role } from '../roles/role.enum';
+import { PartialType } from '@nestjs/mapped-types';
 interface UsuarioProps {
   _idDB?: string;
   idPublico?: string;
+  username: string;
   nombre: string;
-  apellidos: string;
+  biografia?: string;
   email: string;
   password: string;
   role: string;
@@ -15,8 +17,9 @@ interface UsuarioProps {
 export class Usuario {
   _idDB: string;
   idPublico: string;
+  username: string;
   nombre: string;
-  apellidos: string;
+  biografia?: string;
   email: string;
   password: string;
   role: string;
@@ -25,8 +28,9 @@ export class Usuario {
   constructor({
     _idDB,
     idPublico,
+    username,
     nombre,
-    apellidos,
+    biografia,
     email,
     password,
     role,
@@ -34,14 +38,17 @@ export class Usuario {
   }: UsuarioProps) {
     this._idDB = _idDB || '';
     this.idPublico = idPublico || '';
+    this.username = username;
     this.nombre = nombre;
-    this.apellidos = apellidos;
+    this.biografia = biografia;
     this.email = email;
     this.password = password;
     this.role = role;
     this.metadatos = metadatos;
   }
 }
+
+export class UsuarioUpdate extends PartialType(Usuario) {}
 
 interface AlumnoProps extends UsuarioProps {
   turnos: string[];
@@ -52,8 +59,9 @@ export class Alumno extends Usuario {
   constructor({
     _idDB,
     idPublico,
+    username,
     nombre,
-    apellidos,
+    biografia,
     email,
     password,
     role,
@@ -63,8 +71,9 @@ export class Alumno extends Usuario {
     super({
       _idDB,
       idPublico,
+      username,
       nombre,
-      apellidos,
+      biografia,
       email,
       password,
       role,
@@ -76,37 +85,39 @@ export class Alumno extends Usuario {
 
 interface DocenteProps extends UsuarioProps {
   asignaturas: string[];
-  horario: string;
+  clase: string;
 }
 
 export class Docente extends Usuario {
   asignaturas: string[];
-  horario: string;
+  clase: string;
 
   constructor({
     _idDB,
     idPublico,
+    username,
     nombre,
-    apellidos,
+    biografia,
     email,
     password,
     role,
     metadatos,
     asignaturas,
-    horario,
+    clase,
   }: DocenteProps) {
     super({
       _idDB,
       idPublico,
+      username,
       nombre,
-      apellidos,
+      biografia,
       email,
       password,
       role,
       metadatos,
     });
     this.asignaturas = asignaturas;
-    this.horario = horario;
+    this.clase = clase;
   }
 }
 
@@ -144,7 +155,7 @@ export function crearUsuario(
         },
         role: Role.Docente,
         asignaturas: [],
-        horario: '',
+        clase: '',
       });
       break;
     }

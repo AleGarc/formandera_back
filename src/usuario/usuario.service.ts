@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Role } from './roles/role.enum';
 import { UsuarioRepository } from './usuario.repository';
 import { Usuario } from './entities/usuario.entity';
+import * as bcrypt from 'bcrypt';
 
 export type User = any;
 
@@ -11,32 +11,31 @@ export class UsuarioService {
     @Inject(UsuarioRepository)
     private usuarioRepository: UsuarioRepository,
   ) {}
-  private readonly users = [
-    { userId: 1, username: 'john', password: 'changeme', role: Role.Admin },
-    { userId: 2, username: 'jeny', password: 'guess', role: Role.Alumno },
-  ];
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  findOne(id: string) {
+    return this.usuarioRepository.get(id);
   }
 
-  create(nuevoUsuario: Usuario) {
+  findByUsername(username: string) {
+    return this.usuarioRepository.getByEmail(username);
+  }
+
+  async create(nuevoUsuario: Usuario) {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(nuevoUsuario.password, saltRounds);
+    nuevoUsuario.password = hashedPassword;
     return this.usuarioRepository.create(nuevoUsuario);
   }
-  /*
+
+  async update(id: string, usuarioActualizado: Usuario) {
+    return this.usuarioRepository.update(id, usuarioActualizado);
+  }
+
   findAll() {
-    return `This action returns all usuario`;
+    return this.usuarioRepository.getAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} usuario`;
+  remove(id: string) {
+    return this.usuarioRepository.delete(id);
   }
-
-  update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    return `This action updates a #${id} usuario`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} usuario`;
-  } */
 }
