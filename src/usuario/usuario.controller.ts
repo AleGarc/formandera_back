@@ -9,6 +9,7 @@ import {
   HttpStatus,
   NotFoundException,
   Res,
+  ConflictException,
 } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -30,11 +31,21 @@ export class UsuarioController {
 
   @Public()
   @Post()
-  async create(@Body() createUsuarioDto: CreateUsuarioDto) {
+  async create(
+    @Res() response: Response,
+    @Body() createUsuarioDto: CreateUsuarioDto,
+  ) {
     const idPublico = uuidv4();
     const nuevoUsuario = crearUsuario(idPublico, createUsuarioDto);
-    const usuarioCreado = await this.usuarioService.create(nuevoUsuario);
-    return usuarioCreado.idPublico;
+    try {
+      const usuarioCreado = await this.usuarioService.create(nuevoUsuario);
+      response.status(HttpStatus.CREATED).json(usuarioCreado.idPublico).send();
+    } catch (ErrorFormanderaConflict) {
+      response
+        .status(HttpStatus.CONFLICT)
+        .json(new ConflictException(ErrorFormanderaConflict.message))
+        .send();
+    }
   }
 
   @Public()

@@ -13,3 +13,12 @@ export class ErrorFormanderaNotFound extends ErrorFormandera {
     this.codigo = 404;
   }
 }
+
+export class ErrorFormanderaConflict extends ErrorFormandera {
+  codigo: number;
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, ErrorFormanderaConflict.prototype);
+    this.codigo = 409;
+  }
+}

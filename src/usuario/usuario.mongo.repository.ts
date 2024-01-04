@@ -4,7 +4,10 @@ import { AlumnoMongoModel, DocenteMongoModel } from './usuario.schema';
 import { UsuarioRepository } from './usuario.repository';
 import { Usuario, UsuarioUpdate } from './entities/usuario.entity';
 import { Role } from './roles/role.enum';
-import { ErrorFormanderaNotFound } from 'src/base/error';
+import {
+  ErrorFormanderaConflict,
+  ErrorFormanderaNotFound,
+} from 'src/base/error';
 
 export class UsuarioRepositoryMongo extends UsuarioRepository {
   constructor(
@@ -17,6 +20,14 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
   }
 
   async create(item: Usuario): Promise<Usuario> {
+    const usuarioEncontrado = await this.alumnoModel
+      .findOne({ email: item.email })
+      .exec();
+    if (usuarioEncontrado !== null) {
+      throw new ErrorFormanderaConflict(
+        `Ya existe un usuario con email ${item.email}`,
+      );
+    }
     let createdUsuarioMongo: any;
     switch (item.role) {
       case Role.Alumno: {
@@ -35,7 +46,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     const newUsuario = new Usuario(item);
     return newUsuario;
   }
-  private toUsuarioDomain(
+  private alumnoToUsuarioDomain(
     alumnoMongo: HydratedDocument<AlumnoMongoModel>,
   ): Usuario {
     if (alumnoMongo) {
@@ -47,18 +58,32 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     }
   }
 
+  private docenteToUsuarioDomain(
+    docenteMongo: HydratedDocument<DocenteMongoModel>,
+  ): Usuario {
+    if (docenteMongo) {
+      const docente = new Usuario({
+        _idDB: docenteMongo._id.toString(),
+        ...docenteMongo.toObject(),
+      });
+      return docente;
+    }
+  }
+
   async get(id: string): Promise<Usuario> {
     const alumnoMongo = await this.alumnoModel
       .findOne({ idPublico: id })
       .exec();
 
-    return this.toUsuarioDomain(alumnoMongo);
+    return this.alumnoToUsuarioDomain(alumnoMongo);
   }
 
   async getAll(): Promise<Usuario[]> {
     const alumnosMongo = await this.alumnoModel.find().exec();
 
-    return alumnosMongo.map((alumnoMongo) => this.toUsuarioDomain(alumnoMongo));
+    return alumnosMongo.map((alumnoMongo) =>
+      this.alumnoToUsuarioDomain(alumnoMongo),
+    );
   }
 
   async update(id: string, item: UsuarioUpdate): Promise<Usuario> {
@@ -68,7 +93,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
       { new: true },
     );
 
-    return this.toUsuarioDomain(newUsuario);
+    return this.alumnoToUsuarioDomain(newUsuario);
   }
 
   async delete(id: string): Promise<Usuario> | never {
@@ -82,16 +107,18 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
   }
 
   async getByEmail(email: string): Promise<Usuario> | never {
-    const usuarioMongo = await this.alumnoModel
+    const alumnoEncontrado = await this.alumnoModel
       .findOne({ email: email })
       .exec();
-
-    if (usuarioMongo === null) {
-      throw new ErrorFormanderaNotFound(
-        `No existe el usuario con email ${email}`,
-      );
-    } else {
-      return this.toUsuarioDomain(usuarioMongo);
-    }
+    if (alumnoEncontrado === null) {
+      const docenteEncontrado = await this.docenteModel
+        .findOne({ email: email })
+        .exec();
+      if (docenteEncontrado === null) {
+        throw new ErrorFormanderaNotFound(
+          `No existe el usuario con email ${email}`,
+        );
+      } else return this.docenteToUsuarioDomain(docenteEncontrado);
+    } else return this.alumnoToUsuarioDomain(alumnoEncontrado);
   }
 }
