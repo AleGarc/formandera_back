@@ -84,13 +84,17 @@ export class Alumno extends Usuario {
 }
 
 interface DocenteProps extends UsuarioProps {
-  asignaturas: string[];
-  clase: string;
+  educacion?: string[];
+  asignaturas?: string[];
+  experiencia?: string[];
+  clase?: string;
 }
 
 export class Docente extends Usuario {
-  asignaturas: string[];
-  clase: string;
+  educacion?: string[];
+  asignaturas?: string[];
+  experiencia?: string[];
+  clase?: string;
 
   constructor({
     _idDB,
@@ -102,7 +106,9 @@ export class Docente extends Usuario {
     password,
     role,
     metadatos,
+    educacion,
     asignaturas,
+    experiencia,
     clase,
   }: DocenteProps) {
     super({
@@ -116,7 +122,9 @@ export class Docente extends Usuario {
       role,
       metadatos,
     });
+    this.educacion = educacion;
     this.asignaturas = asignaturas;
+    this.experiencia = experiencia;
     this.clase = clase;
   }
 }
@@ -154,8 +162,6 @@ export function crearUsuario(
           updatedAt: '',
         },
         role: Role.Docente,
-        asignaturas: [],
-        clase: '',
       });
       break;
     }

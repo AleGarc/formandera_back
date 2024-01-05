@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ClaseMongoModel } from './clase.schema';
 import { Clase } from './entities/clase.entity';
 import { ClaseRepository } from './clase.repository';
+import { ErrorFormanderaNotFound } from 'src/base/error';
 
 export class ClaseRepositoryMongo extends ClaseRepository {
   constructor(
@@ -31,8 +32,9 @@ export class ClaseRepositoryMongo extends ClaseRepository {
 
   async get(id: string): Promise<Clase> {
     const claseMongo = await this.claseModel.findOne({ idPublico: id }).exec();
-
-    return this.toClaseDomain(claseMongo);
+    if (claseMongo === null)
+      throw new ErrorFormanderaNotFound(`No existe la clase con id ${id}`);
+    else return this.toClaseDomain(claseMongo);
   }
 
   async getAll(): Promise<Clase[]> {
@@ -42,16 +44,14 @@ export class ClaseRepositoryMongo extends ClaseRepository {
   }
 
   async update(id: string, item: Clase): Promise<Clase> {
-    const oldClaseMongo = await this.claseModel
-      .findByIdAndUpdate(id, item)
-      .exec();
-
-    const newClase = new Clase({
-      ...item,
-      _idDB: oldClaseMongo._id.toString(),
-    });
-
-    return newClase;
+    const newClase = await this.claseModel.findOneAndUpdate(
+      { idPublico: id },
+      item,
+      { new: true },
+    );
+    if (newClase === null)
+      throw new ErrorFormanderaNotFound(`No existe la clase con id ${id}`);
+    else return this.toClaseDomain(newClase);
   }
 
   async delete(id: string): Promise<Clase> | never {

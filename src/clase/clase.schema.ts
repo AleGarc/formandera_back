@@ -16,6 +16,9 @@ export class ClaseMongoModel {
   @Prop({ required: true })
   descripcion: string;
 
+  @Prop({ required: false })
+  precio: number;
+
   @Prop({ required: true })
   idProfesor: string;
 

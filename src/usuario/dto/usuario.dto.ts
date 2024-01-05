@@ -6,8 +6,11 @@ export class UsuarioDto {
   email: string;
   role: string;
   turnos?: string[];
+  educacion?: string[];
   asignaturas?: string[];
+  experiencia?: string[];
   clase?: string;
+
   constructor({
     idPublico,
     username,
@@ -16,7 +19,9 @@ export class UsuarioDto {
     email,
     role,
     turnos,
+    educacion,
     asignaturas,
+    experiencia,
     clase,
   }: {
     idPublico: string;
@@ -26,7 +31,9 @@ export class UsuarioDto {
     email: string;
     role: string;
     turnos?: string[];
+    educacion?: string[];
     asignaturas?: string[];
+    experiencia?: string[];
     clase?: string;
   }) {
     this.idPublico = idPublico;
@@ -36,7 +43,9 @@ export class UsuarioDto {
     this.email = email;
     this.role = role;
     this.turnos = turnos;
+    this.educacion = educacion;
     this.asignaturas = asignaturas;
+    this.experiencia = experiencia;
     this.clase = clase;
   }
 }

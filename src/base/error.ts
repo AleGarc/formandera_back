@@ -22,3 +22,12 @@ export class ErrorFormanderaConflict extends ErrorFormandera {
     this.codigo = 409;
   }
 }
+
+export class ErrorFormanderaBadRequest extends ErrorFormandera {
+  codigo: number;
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, ErrorFormanderaBadRequest.prototype);
+    this.codigo = 400;
+  }
+}

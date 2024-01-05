@@ -16,7 +16,7 @@ export class UsuarioService {
     return this.usuarioRepository.get(id);
   }
 
-  findByUsername(username: string) {
+  findByEmail(username: string) {
     return this.usuarioRepository.getByEmail(username);
   }
 

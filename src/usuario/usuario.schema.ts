@@ -64,8 +64,14 @@ export class DocenteMongoModel {
   @Prop({ required: true })
   metadatos: Metadatos;
 
-  @Prop({ required: true, type: [String] })
+  @Prop({ required: false, type: [String] })
+  educacion: string[];
+
+  @Prop({ required: false, type: [String] })
   asignaturas: string[];
+
+  @Prop({ required: false, type: [String] })
+  experiencia: string[];
 
   @Prop({ required: false })
   clase: string;

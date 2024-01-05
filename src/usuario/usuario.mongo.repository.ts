@@ -2,7 +2,7 @@ import { HydratedDocument, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AlumnoMongoModel, DocenteMongoModel } from './usuario.schema';
 import { UsuarioRepository } from './usuario.repository';
-import { Usuario, UsuarioUpdate } from './entities/usuario.entity';
+import { Docente, Usuario, UsuarioUpdate } from './entities/usuario.entity';
 import { Role } from './roles/role.enum';
 import {
   ErrorFormanderaConflict,
@@ -62,7 +62,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     docenteMongo: HydratedDocument<DocenteMongoModel>,
   ): Usuario {
     if (docenteMongo) {
-      const docente = new Usuario({
+      const docente = new Docente({
         _idDB: docenteMongo._id.toString(),
         ...docenteMongo.toObject(),
       });
@@ -74,8 +74,14 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     const alumnoMongo = await this.alumnoModel
       .findOne({ idPublico: id })
       .exec();
-
-    return this.alumnoToUsuarioDomain(alumnoMongo);
+    if (alumnoMongo === null) {
+      const docenteMongo = await this.docenteModel
+        .findOne({ idPublico: id })
+        .exec();
+      if (docenteMongo === null)
+        throw new ErrorFormanderaNotFound(`No existe el usuario con id ${id}`);
+      else return this.docenteToUsuarioDomain(docenteMongo);
+    } else return this.alumnoToUsuarioDomain(alumnoMongo);
   }
 
   async getAll(): Promise<Usuario[]> {
