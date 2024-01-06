@@ -58,9 +58,13 @@ export class UsuarioController {
 
   @Public()
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const usuario = await this.usuarioService.findOne(id);
-    return new UsuarioDto(usuario);
+  async findOne(@Res() response: Response, @Param('id') id: string) {
+    try {
+      const usuario = await this.usuarioService.findOne(id);
+      response.status(HttpStatus.OK).json(new UsuarioDto(usuario)).send();
+    } catch (ErrorFormanderaNotFound) {
+      response.status(HttpStatus.NOT_FOUND).send();
+    }
   }
 
   @Public()

@@ -85,10 +85,15 @@ export class Clase {
     this.turnos.forEach((turnoClase) => {
       if (turnoClase.dia === turno.dia) {
         if (
-          (turno.horaInicio > turnoClase.horaInicio &&
+          (turno.idPublico !== turnoClase.idPublico &&
+            turno.horaInicio > turnoClase.horaInicio &&
             turno.horaInicio < turnoClase.horaFin) ||
-          (turno.horaFin > turnoClase.horaInicio &&
-            turno.horaFin < turnoClase.horaFin)
+          (turno.idPublico !== turnoClase.idPublico &&
+            turno.horaFin > turnoClase.horaInicio &&
+            turno.horaFin < turnoClase.horaFin) ||
+          (turno.idPublico !== turnoClase.idPublico &&
+            turno.horaInicio === turnoClase.horaInicio &&
+            turno.horaFin === turnoClase.horaFin)
         ) {
           throw new ErrorFormanderaBadRequest(
             'El turno se solapa con otro turno de la clase.',
@@ -118,9 +123,36 @@ export class Clase {
     }
   }
 
+  private actualizarYOrdenarTurnos(turnoActualizado: Turno) {
+    const turnoIndex = this.turnos.findIndex(
+      (turno) => turno.idPublico === turnoActualizado.idPublico,
+    );
+
+    if (turnoIndex !== -1) {
+      // Actualiza el turno existente
+      this.turnos[turnoIndex] = turnoActualizado;
+
+      // Crea una copia del array de turnos
+      const nuevosTurnos = [...this.turnos];
+
+      // Ordena el array según el día y la hora de inicio
+      nuevosTurnos.sort((a, b) => {
+        if (a.dia !== b.dia) {
+          return a.dia.localeCompare(b.dia);
+        } else {
+          return a.horaInicio.localeCompare(b.horaInicio);
+        }
+      });
+
+      this.turnos = nuevosTurnos;
+    } else {
+      throw new ErrorFormanderaNotFound('No se ha encontrado el turno');
+    }
+  }
+
   cambiarTurno(turno: Turno) {
     const turnoIndex = this.turnos.findIndex(
-      (turno) => turno.idPublico === turno.idPublico,
+      (turnoClase) => turnoClase.idPublico === turno.idPublico,
     );
     if (turnoIndex === -1) {
       throw new ErrorFormanderaNotFound('No se ha encontrado el turno');
@@ -138,16 +170,33 @@ export class Clase {
 
     this.checkHoras(turnoActualizado);
     this.checkOtrosTurnos(turnoActualizado);
-    this.turnos[turnoIndex] = turnoActualizado;
+    this.actualizarYOrdenarTurnos(turnoActualizado);
 
     this.metadatos.updatedAt = new Date().toISOString();
     this.metadatos.updatedBy = this.metadatos.updatedBy;
   }
 
+  private insertarEnOrden(turno: Turno) {
+    let i = 0;
+    const nuevosTurnos = [...this.turnos];
+    while (i < nuevosTurnos.length && turno.dia > nuevosTurnos[i].dia) {
+      i++;
+    }
+    while (
+      i < nuevosTurnos.length &&
+      turno.dia === nuevosTurnos[i].dia &&
+      turno.horaInicio > nuevosTurnos[i].horaInicio
+    ) {
+      i++;
+    }
+    nuevosTurnos.splice(i, 0, turno);
+    return nuevosTurnos;
+  }
+
   nuevoTurno(turno: Turno) {
     this.checkHoras(turno);
     this.checkOtrosTurnos(turno);
-    this.turnos.push(turno);
+    this.turnos = this.insertarEnOrden(turno);
 
     this.metadatos.updatedAt = new Date().toISOString();
     this.metadatos.updatedBy = this.metadatos.updatedBy;
@@ -159,7 +208,12 @@ export class Clase {
     );
     if (turnoIndex === -1) {
       throw new ErrorFormanderaNotFound('No se ha encontrado el turno');
+    } else if (this.turnos[turnoIndex].idAlumnos.length > 0) {
+      throw new ErrorFormanderaBadRequest(
+        'No se puede borrar un turno con alumnos apuntados.',
+      );
     }
+
     this.turnos.splice(turnoIndex, 1);
 
     this.metadatos.updatedAt = new Date().toISOString();

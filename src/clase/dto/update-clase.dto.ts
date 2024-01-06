@@ -5,10 +5,6 @@ import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class UpdateClaseDto extends PartialType(CreateClaseDto) {}
 
 export class UpdateTurnoDto extends PartialType(CreateTurnoDto) {
-  @IsNotEmpty()
-  @IsString()
-  readonly idPublico: string;
-
   @IsOptional()
   @IsNotEmpty()
   @IsArray()

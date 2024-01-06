@@ -78,7 +78,7 @@ export class ClaseService {
     clase.cambiarTurno(turno);
     const claseActualizada = await this.claseRepository.update(idClase, clase);
     return claseActualizada.turnos.find(
-      (turno) => turno.idPublico === turno.idPublico,
+      (turnoClase) => turnoClase.idPublico === turno.idPublico,
     );
   }
 

@@ -100,16 +100,17 @@ export class ClaseController {
 
   @Roles(Role.Alumno)
   @UseGuards(RolesGuard)
-  @Post(':id/turnos')
+  @Post(':id/turnos/:idTurno')
   async apuntarAlumno(
     @Res() response: Response,
     @Param('id') idClase: string,
+    @Param('idTurno') idTurno: string,
     @Body() apuntarDto: ApuntarDto,
   ) {
     try {
       const clase = await this.claseService.apuntarAlumno(
         idClase,
-        apuntarDto.idTurno,
+        idTurno,
         apuntarDto.idAlumno,
         apuntarDto.apuntarse,
       );
@@ -122,7 +123,7 @@ export class ClaseController {
           .send();
       } else if (error instanceof ErrorFormanderaBadRequest) {
         response
-          .status(HttpStatus.NOT_FOUND)
+          .status(HttpStatus.BAD_REQUEST)
           .json(new BadRequestException(error.message))
           .send();
       } else {
@@ -133,15 +134,16 @@ export class ClaseController {
 
   @Roles(Role.Docente)
   @UseGuards(RolesGuard)
-  @Patch(':id/turnos')
+  @Patch(':id/turnos/:idTurno')
   async modificarTurno(
     @Res() response: Response,
     @Param('id') idClase: string,
+    @Param('idTurno') idTurno: string,
     @Body() updateTurnoDto: UpdateTurnoDto,
   ) {
     try {
       const turno = new Turno({
-        idPublico: updateTurnoDto.idPublico,
+        idPublico: idTurno,
         dia: updateTurnoDto.dia,
         asignatura: updateTurnoDto.asignatura,
         horaInicio: updateTurnoDto.horaInicio,
@@ -159,7 +161,7 @@ export class ClaseController {
           .send();
       } else if (error instanceof ErrorFormanderaBadRequest) {
         response
-          .status(HttpStatus.NOT_FOUND)
+          .status(HttpStatus.BAD_REQUEST)
           .json(new BadRequestException(error.message))
           .send();
       } else {
@@ -196,7 +198,7 @@ export class ClaseController {
           .send();
       } else if (error instanceof ErrorFormanderaBadRequest) {
         response
-          .status(HttpStatus.NOT_FOUND)
+          .status(HttpStatus.BAD_REQUEST)
           .json(new BadRequestException(error.message))
           .send();
       } else {
