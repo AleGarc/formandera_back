@@ -38,6 +38,7 @@ export class ClaseController {
   @Public()
   @Post()
   create(@Body() createClaseDto: CreateClaseDto) {
+    //Meter aqui el servicio de valoraciones y crear una
     //pasar de dto a dominio
     return this.claseService.create(createClaseDto);
   }
@@ -49,8 +50,20 @@ export class ClaseController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.claseService.findOne(id);
+  async findOne(@Res() response: Response, @Param('id') id: string) {
+    try {
+      const clase = await this.claseService.findOne(id);
+      response.status(200).json(new ClaseDto(clase)).send();
+    } catch (error) {
+      if (error instanceof ErrorFormanderaNotFound) {
+        response
+          .status(HttpStatus.NOT_FOUND)
+          .json(new NotFoundException(error.message))
+          .send();
+      } else {
+        response.json(error).send();
+      }
+    }
   }
 
   @Roles(Role.Docente)
@@ -66,6 +79,7 @@ export class ClaseController {
         idPublico: id,
         nombre: updateClaseDto.nombre,
         descripcion: updateClaseDto.descripcion,
+        ubicacion: updateClaseDto.ubicacion,
         precio: updateClaseDto.precio,
         idProfesor: updateClaseDto.idProfesor,
         asignaturas: updateClaseDto.asignaturas,
@@ -94,8 +108,20 @@ export class ClaseController {
   @Roles(Role.Docente)
   @UseGuards(RolesGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.claseService.remove(id);
+  async remove(@Res() response: Response, @Param('id') id: string) {
+    try {
+      await this.claseService.remove(id);
+      response.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      if (error instanceof ErrorFormanderaNotFound) {
+        response
+          .status(HttpStatus.NOT_FOUND)
+          .json(new NotFoundException(error.message))
+          .send();
+      } else {
+        response.json(error).send();
+      }
+    }
   }
 
   @Roles(Role.Alumno)
@@ -176,16 +202,16 @@ export class ClaseController {
   async nuevoTurno(
     @Res() response: Response,
     @Param('id') idClase: string,
-    @Body() CreateTurnoDto: CreateTurnoDto,
+    @Body() createTurnoDto: CreateTurnoDto,
   ) {
     try {
       const turno = new Turno({
         idPublico: uuidv4(),
-        dia: CreateTurnoDto.dia,
-        asignatura: CreateTurnoDto.asignatura,
-        horaInicio: CreateTurnoDto.horaInicio,
-        horaFin: CreateTurnoDto.horaFin,
-        alumnosMax: CreateTurnoDto.alumnosMax,
+        dia: createTurnoDto.dia,
+        asignatura: createTurnoDto.asignatura,
+        horaInicio: createTurnoDto.horaInicio,
+        horaFin: createTurnoDto.horaFin,
+        alumnosMax: createTurnoDto.alumnosMax,
         idAlumnos: [],
       });
       const nuevoTurno = await this.claseService.nuevoTurno(idClase, turno);

@@ -56,7 +56,8 @@ export class ClaseRepositoryMongo extends ClaseRepository {
 
   async delete(id: string): Promise<Clase> | never {
     const clase = await this.get(id);
-    if (clase === undefined) throw new Error(`No existe la clase con id ${id}`);
+    if (clase === undefined)
+      throw new ErrorFormanderaNotFound(`No existe la clase con id ${id}`);
     else {
       await this.claseModel.findOneAndDelete({ idPublico: id }).exec();
       return clase;

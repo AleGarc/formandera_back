@@ -20,7 +20,13 @@ export class CreateClaseDto {
   descripcion: string;
 
   @IsNotEmpty()
+  @IsString()
+  ubicacion: string;
+
+  @IsNotEmpty()
   @IsNumber()
+  @Min(0)
+  @Max(100)
   precio: number;
 
   @IsNotEmpty()

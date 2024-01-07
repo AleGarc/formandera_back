@@ -1,7 +1,6 @@
 import { Metadatos } from 'src/base/metadatos';
 import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { Role } from '../roles/role.enum';
-import { PartialType } from '@nestjs/mapped-types';
 interface UsuarioProps {
   _idDB?: string;
   idPublico?: string;
@@ -47,8 +46,6 @@ export class Usuario {
     this.metadatos = metadatos;
   }
 }
-
-export class UsuarioUpdate extends PartialType(Usuario) {}
 
 interface AlumnoProps extends UsuarioProps {
   turnos: string[];

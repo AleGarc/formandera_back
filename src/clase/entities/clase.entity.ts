@@ -9,11 +9,11 @@ export class Clase {
   idPublico: string;
   nombre: string;
   descripcion: string;
+  ubicacion: string;
   precio?: number;
   idProfesor: string;
   asignaturas: string[];
   turnos: Turno[];
-  //ubicación: string;
   metadatos: Metadatos;
 
   constructor({
@@ -21,6 +21,7 @@ export class Clase {
     idPublico,
     nombre,
     descripcion,
+    ubicacion,
     precio,
     idProfesor,
     asignaturas,
@@ -31,6 +32,7 @@ export class Clase {
     idPublico?: string;
     nombre: string;
     descripcion: string;
+    ubicacion: string;
     precio?: number;
     idProfesor: string;
     asignaturas: string[];
@@ -41,6 +43,7 @@ export class Clase {
     this.idPublico = idPublico;
     this.nombre = nombre;
     this.descripcion = descripcion;
+    this.ubicacion = ubicacion;
     this.precio = precio;
     this.idProfesor = idProfesor;
     this.asignaturas = asignaturas;
@@ -51,6 +54,7 @@ export class Clase {
   modificarClase(clase: Clase) {
     this.nombre = clase.nombre;
     this.descripcion = clase.descripcion;
+    this.ubicacion = clase.ubicacion;
     this.precio = clase.precio;
     this.asignaturas = clase.asignaturas;
     this.metadatos.updatedAt = new Date().toISOString();

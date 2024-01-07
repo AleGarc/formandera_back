@@ -31,3 +31,12 @@ export class ErrorFormanderaBadRequest extends ErrorFormandera {
     this.codigo = 400;
   }
 }
+
+export class ErrorFormanderaUnauthorized extends ErrorFormandera {
+  codigo: number;
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, ErrorFormanderaUnauthorized.prototype);
+    this.codigo = 401;
+  }
+}

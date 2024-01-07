@@ -2,9 +2,10 @@ import { HydratedDocument, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AlumnoMongoModel, DocenteMongoModel } from './usuario.schema';
 import { UsuarioRepository } from './usuario.repository';
-import { Docente, Usuario, UsuarioUpdate } from './entities/usuario.entity';
+import { Docente, Usuario } from './entities/usuario.entity';
 import { Role } from './roles/role.enum';
 import {
+  ErrorFormanderaBadRequest,
   ErrorFormanderaConflict,
   ErrorFormanderaNotFound,
 } from 'src/base/error';
@@ -39,7 +40,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
         break;
       }
       default:
-        throw new Error('No se reconoce el rol');
+        throw new ErrorFormanderaBadRequest('No se reconoce el rol');
     }
 
     item._idDB = createdUsuarioMongo._id.toString();
@@ -92,7 +93,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     );
   }
 
-  async update(id: string, item: UsuarioUpdate): Promise<Usuario> {
+  async update(id: string, item: Usuario): Promise<Usuario> {
     const newUsuario = await this.alumnoModel.findOneAndUpdate(
       { idPublico: id },
       item,

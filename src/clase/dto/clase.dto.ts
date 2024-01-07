@@ -4,6 +4,7 @@ export class ClaseDto {
   idPublico?: string;
   nombre: string;
   descripcion: string;
+  ubicacion: string;
   precio?: number;
   idProfesor: string;
   asignaturas: string[];
@@ -13,6 +14,7 @@ export class ClaseDto {
     idPublico,
     nombre,
     descripcion,
+    ubicacion,
     precio,
     idProfesor,
     asignaturas,
@@ -21,6 +23,7 @@ export class ClaseDto {
     idPublico?: string;
     nombre: string;
     descripcion: string;
+    ubicacion: string;
     precio?: number;
     idProfesor: string;
     asignaturas: string[];
@@ -29,6 +32,7 @@ export class ClaseDto {
     this.idPublico = idPublico;
     this.nombre = nombre;
     this.descripcion = descripcion;
+    this.ubicacion = ubicacion;
     this.precio = precio;
     this.idProfesor = idProfesor;
     this.asignaturas = asignaturas;

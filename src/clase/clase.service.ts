@@ -4,12 +4,13 @@ import { ClaseRepository } from './clase.repository';
 import { Clase } from './entities/clase.entity';
 import { Turno } from './entities/clase.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { ClaseDto } from './dto/clase.dto';
+import { ValoracionService } from 'src/valoracion/valoracion.service';
 
 @Injectable()
 export class ClaseService {
   constructor(
     @Inject(ClaseRepository) private claseRepository: ClaseRepository,
+    @Inject(ValoracionService) private valoracionService: ValoracionService,
   ) {}
   create(createClaseDto: CreateClaseDto) {
     const turnosDto = createClaseDto.turnos;
@@ -33,6 +34,7 @@ export class ClaseService {
       },
     });
     this.claseRepository.create(clase);
+    this.valoracionService.create(clase.idPublico);
     return clase.idPublico;
   }
 
@@ -41,9 +43,7 @@ export class ClaseService {
   }
 
   async findOne(id: string) {
-    const claseDB = await this.claseRepository.get(id);
-    //mover esto al controlador
-    return new ClaseDto(claseDB);
+    return await this.claseRepository.get(id);
   }
 
   async update(id: string, clase: Clase) {
@@ -54,12 +54,8 @@ export class ClaseService {
   }
 
   async remove(id: string) {
-    try {
-      await this.claseRepository.delete(id);
-    } catch (error) {
-      //Esto se hace en el repositorio
-      //return new ErrorFormandera({ codigo: '404', mensaje: error.message });
-    }
+    await this.claseRepository.delete(id);
+    await this.valoracionService.remove(id);
   }
 
   async apuntarAlumno(
