@@ -4,12 +4,20 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
   readonly biografia: string;
 
   @IsOptional()
   @IsNotEmpty()
+  @IsString()
+  readonly curso_academico: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString({ each: true })
+  readonly turnos: string[];
+
+  @IsOptional()
   @IsString()
   readonly clase: string;
 
@@ -27,4 +35,9 @@ export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   @IsNotEmpty()
   @IsString({ each: true })
   readonly educacion: string[];
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  readonly idComentario: string;
 }

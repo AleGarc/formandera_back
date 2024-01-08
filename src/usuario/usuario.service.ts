@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UsuarioRepository } from './usuario.repository';
-import { Usuario } from './entities/usuario.entity';
+import { Alumno, Usuario } from './entities/usuario.entity';
 import * as bcrypt from 'bcrypt';
 
 export type User = any;
@@ -16,8 +16,12 @@ export class UsuarioService {
     return this.usuarioRepository.get(id);
   }
 
-  findByEmail(username: string) {
-    return this.usuarioRepository.getByEmail(username);
+  findByUsername(username: string) {
+    return this.usuarioRepository.getByUsername(username);
+  }
+
+  findByEmail(email: string) {
+    return this.usuarioRepository.getByEmail(email);
   }
 
   async create(nuevoUsuario: Usuario) {
@@ -37,5 +41,25 @@ export class UsuarioService {
 
   remove(id: string) {
     return this.usuarioRepository.delete(id);
+  }
+
+  async expulsarAlumno(idAlumno: string, idTurno: string) {
+    const usuario = await this.usuarioRepository.get(idAlumno);
+    if (usuario instanceof Alumno) {
+      usuario.expulsar(idTurno);
+    }
+    return await this.usuarioRepository.update(idAlumno, usuario);
+  }
+
+  async agregarComentario(idUsuario: string, idComentario: string) {
+    const usuario = await this.usuarioRepository.get(idUsuario);
+    usuario.agregarComentario(idComentario);
+    return await this.usuarioRepository.update(idUsuario, usuario);
+  }
+
+  async borrarComentario(idUsuario: string, idComentario: string) {
+    const usuario = await this.usuarioRepository.get(idUsuario);
+    usuario.eliminarComentario(idComentario);
+    return await this.usuarioRepository.update(idUsuario, usuario);
   }
 }

@@ -11,6 +11,7 @@ import {
   NotFoundException,
   BadRequestException,
   UseGuards,
+  Request,
   Put,
 } from '@nestjs/common';
 import { ClaseService } from './clase.service';
@@ -21,6 +22,7 @@ import { Response } from 'express';
 import {
   ErrorFormanderaBadRequest,
   ErrorFormanderaNotFound,
+  ErrorFormanderaUnauthorized,
 } from 'src/base/error';
 import { ClaseDto, TurnoDto } from './dto/clase.dto';
 import { ApuntarDto } from './dto/apuntar.dto';
@@ -54,11 +56,13 @@ export class ClaseController {
       });
       const nuevaClase = await this.claseService.create(clase);
       response.status(201).json(new ClaseDto(nuevaClase)).send();
+      return;
     } catch (ErrorFormanderaConflict) {
       response
         .status(HttpStatus.CONFLICT)
         .json(ErrorFormanderaConflict.message)
         .send();
+      return;
     }
   }
 
@@ -73,14 +77,11 @@ export class ClaseController {
     try {
       const clase = await this.claseService.findOne(id);
       response.status(200).json(new ClaseDto(clase)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
-        response
-          .status(HttpStatus.NOT_FOUND)
-          .json(new NotFoundException(error.message))
-          .send();
-      } else {
-        response.json(error).send();
+        response.status(HttpStatus.NOT_FOUND).json(error.message).send();
+        return;
       }
     }
   }
@@ -112,6 +113,7 @@ export class ClaseController {
       });
       const claseActualizada = await this.claseService.update(id, clase);
       response.status(200).json(new ClaseDto(claseActualizada)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
@@ -120,6 +122,7 @@ export class ClaseController {
           .send();
       } else {
         response.json(error).send();
+        return;
       }
     }
   }
@@ -131,6 +134,7 @@ export class ClaseController {
     try {
       await this.claseService.remove(id);
       response.status(HttpStatus.NO_CONTENT).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
@@ -139,6 +143,7 @@ export class ClaseController {
           .send();
       } else {
         response.json(error).send();
+        return;
       }
     }
   }
@@ -160,19 +165,23 @@ export class ClaseController {
         apuntarDto.apuntarse,
       );
       response.status(200).json(new ClaseDto(clase)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
           .status(HttpStatus.NOT_FOUND)
           .json(new NotFoundException(error.message))
           .send();
+        return;
       } else if (error instanceof ErrorFormanderaBadRequest) {
         response
           .status(HttpStatus.BAD_REQUEST)
           .json(new BadRequestException(error.message))
           .send();
+        return;
       } else {
         response.json(error).send();
+        return;
       }
     }
   }
@@ -198,19 +207,23 @@ export class ClaseController {
       });
       const nuevoTurno = await this.claseService.modificarTurno(idClase, turno);
       response.status(200).json(new TurnoDto(nuevoTurno)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
           .status(HttpStatus.NOT_FOUND)
           .json(new NotFoundException(error.message))
           .send();
+        return;
       } else if (error instanceof ErrorFormanderaBadRequest) {
         response
           .status(HttpStatus.BAD_REQUEST)
           .json(new BadRequestException(error.message))
           .send();
+        return;
       } else {
         response.json(error).send();
+        return;
       }
     }
   }
@@ -235,19 +248,23 @@ export class ClaseController {
       });
       const nuevoTurno = await this.claseService.nuevoTurno(idClase, turno);
       response.status(201).json(new ClaseDto(nuevoTurno)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
           .status(HttpStatus.NOT_FOUND)
           .json(new NotFoundException(error.message))
           .send();
+        return;
       } else if (error instanceof ErrorFormanderaBadRequest) {
         response
           .status(HttpStatus.BAD_REQUEST)
           .json(new BadRequestException(error.message))
           .send();
+        return;
       } else {
         response.json(error).send();
+        return;
       }
     }
   }
@@ -263,6 +280,52 @@ export class ClaseController {
     try {
       await this.claseService.borrarTurno(idClase, idTurno);
       response.status(HttpStatus.NO_CONTENT).send();
+      return;
+    } catch (error) {
+      if (error instanceof ErrorFormanderaNotFound) {
+        response
+          .status(HttpStatus.NOT_FOUND)
+          .json(new NotFoundException(error.message))
+          .send();
+        return;
+      } else if (error instanceof ErrorFormanderaBadRequest) {
+        response
+          .status(HttpStatus.NOT_FOUND)
+          .json(new BadRequestException(error.message))
+          .send();
+        return;
+      } else {
+        response.json(error).send();
+        return;
+      }
+    }
+  }
+
+  @Roles(Role.Docente)
+  @UseGuards(RolesGuard)
+  @Patch(':id/turnos/:idTurno/alumnos/:idAlumno')
+  async expulsarAlumno(
+    @Request() req,
+    @Res() response: Response,
+    @Param('id') idClase: string,
+    @Param('idTurno') idTurno: string,
+    @Param('idAlumno') idAlumno: string,
+  ) {
+    try {
+      console.log(idClase, idTurno, idAlumno);
+      const claseDB = await this.claseService.findOne(idClase);
+      //Comparación del id del usuario logueado con el id del autor del comentario.
+      if (req.user.idPublico !== claseDB.idProfesor)
+        throw new ErrorFormanderaUnauthorized(
+          'No eres el usuario autor de esta cuenta',
+        );
+
+      const clase = await this.claseService.expulsarAlumno(
+        idClase,
+        idTurno,
+        idAlumno,
+      );
+      response.status(200).json(new ClaseDto(clase)).send();
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
@@ -271,7 +334,7 @@ export class ClaseController {
           .send();
       } else if (error instanceof ErrorFormanderaBadRequest) {
         response
-          .status(HttpStatus.NOT_FOUND)
+          .status(HttpStatus.BAD_REQUEST)
           .json(new BadRequestException(error.message))
           .send();
       } else {

@@ -6,10 +6,12 @@ import { ClaseMongoModel, ClaseSchema } from './clase.schema';
 import { ClaseRepository } from './clase.repository';
 import { ClaseRepositoryMongo } from './clase.mongo.repository';
 import { ValoracionModule } from 'src/valoracion/valoracion.module';
+import { UsuarioModule } from 'src/usuario/usuario.module';
 
 @Module({
   imports: [
     ValoracionModule,
+    UsuarioModule,
     MongooseModule.forFeature([
       { name: ClaseMongoModel.name, schema: ClaseSchema },
     ]),

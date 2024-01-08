@@ -3,4 +3,5 @@ import { Usuario } from './entities/usuario.entity';
 
 export abstract class UsuarioRepository extends IGenericRepository<Usuario> {
   abstract getByEmail(email: string): Promise<Usuario>;
+  abstract getByUsername(username: string): Promise<Usuario>;
 }

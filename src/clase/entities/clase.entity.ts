@@ -67,7 +67,7 @@ export class Clase {
     if (!turno) {
       throw new ErrorFormanderaNotFound('No se ha encontrado el turno');
     }
-    if (turno.idAlumnos.length >= turno.alumnosMax) {
+    if (apuntarse && turno.idAlumnos.length >= turno.alumnosMax) {
       throw new ErrorFormanderaBadRequest('El turno está completo');
     }
     if (apuntarse && turno.idAlumnos.includes(idAlumno)) {

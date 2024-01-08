@@ -36,11 +36,12 @@ export class ValoracionController {
     try {
       const valoracion = await this.valoracionService.findOne(id);
       response.status(HttpStatus.OK).json(new ValoracionDto(valoracion)).send();
-    } catch (ErrorFormanderaNotFound) {
-      response
-        .status(HttpStatus.NOT_FOUND)
-        .json(new NotFoundException(ErrorFormanderaNotFound))
-        .send();
+      return;
+    } catch (error) {
+      if (error instanceof ErrorFormanderaNotFound) {
+        response.status(HttpStatus.NOT_FOUND).json(error.message).send();
+        return;
+      }
     }
   }
 
@@ -59,17 +60,20 @@ export class ValoracionController {
         nuevoComentario,
       );
       response.status(HttpStatus.OK).json(new ValoracionDto(valoracion)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
           .status(HttpStatus.NOT_FOUND)
           .json(new NotFoundException(error.message))
           .send();
+        return;
       } else if (error instanceof ErrorFormanderaConflict) {
         response
           .status(HttpStatus.CONFLICT)
           .json(new ConflictException(error.message))
           .send();
+        return;
       }
     }
   }
@@ -119,17 +123,20 @@ export class ValoracionController {
       );
 
       response.status(HttpStatus.OK).json(new ValoracionDto(valoracion)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
           .status(HttpStatus.NOT_FOUND)
           .json(new NotFoundException(error.message))
           .send();
+        return;
       } else if (error instanceof ErrorFormanderaUnauthorized) {
         response
           .status(HttpStatus.UNAUTHORIZED)
           .json(new UnauthorizedException(error.message))
           .send();
+        return;
       }
     }
   }
@@ -156,17 +163,20 @@ export class ValoracionController {
       //Se ha optado por devolver la valoración completa una vez
       //eliminado el comentario para que el cliente pueda refrescar el estado.
       response.status(HttpStatus.OK).json(new ValoracionDto(valoracion)).send();
+      return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {
         response
           .status(HttpStatus.NOT_FOUND)
           .json(new NotFoundException(error.message))
           .send();
+        return;
       } else if (error instanceof ErrorFormanderaUnauthorized) {
         response
           .status(HttpStatus.UNAUTHORIZED)
           .json(new UnauthorizedException(error.message))
           .send();
+        return;
       }
     }
   }

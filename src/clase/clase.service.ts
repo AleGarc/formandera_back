@@ -4,12 +4,14 @@ import { Clase } from './entities/clase.entity';
 import { Turno } from './entities/clase.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ValoracionService } from 'src/valoracion/valoracion.service';
+import { UsuarioService } from 'src/usuario/usuario.service';
 
 @Injectable()
 export class ClaseService {
   constructor(
     @Inject(ClaseRepository) private claseRepository: ClaseRepository,
     @Inject(ValoracionService) private valoracionService: ValoracionService,
+    @Inject(UsuarioService) private usuarioService: UsuarioService,
   ) {}
   async create(clase: Clase) {
     clase.idPublico = uuidv4();
@@ -69,5 +71,12 @@ export class ClaseService {
     const clase = await this.claseRepository.get(idClase);
     clase.borrarTurno(idTurno);
     await this.claseRepository.update(idClase, clase);
+  }
+
+  async expulsarAlumno(idClase: string, idTurno: string, idAlumno: string) {
+    const clase = await this.claseRepository.get(idClase);
+    clase.apuntarAlumno(idTurno, idAlumno, false);
+    await this.usuarioService.expulsarAlumno(idAlumno, idTurno);
+    return await this.claseRepository.update(idClase, clase);
   }
 }

@@ -2,7 +2,7 @@ import { HydratedDocument, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AlumnoMongoModel, DocenteMongoModel } from './usuario.schema';
 import { UsuarioRepository } from './usuario.repository';
-import { Docente, Usuario } from './entities/usuario.entity';
+import { Alumno, Docente, Usuario } from './entities/usuario.entity';
 import { Role } from './roles/role.enum';
 import {
   ErrorFormanderaBadRequest,
@@ -51,7 +51,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     alumnoMongo: HydratedDocument<AlumnoMongoModel>,
   ): Usuario {
     if (alumnoMongo) {
-      const alumno = new Usuario({
+      const alumno = new Alumno({
         _idDB: alumnoMongo._id.toString(),
         ...alumnoMongo.toObject(),
       });
@@ -133,6 +133,22 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
       if (docenteEncontrado === null) {
         throw new ErrorFormanderaNotFound(
           `No existe el usuario con email ${email}`,
+        );
+      } else return this.docenteToUsuarioDomain(docenteEncontrado);
+    } else return this.alumnoToUsuarioDomain(alumnoEncontrado);
+  }
+
+  async getByUsername(username: string): Promise<Usuario> | never {
+    const alumnoEncontrado = await this.alumnoModel
+      .findOne({ username: username })
+      .exec();
+    if (alumnoEncontrado === null) {
+      const docenteEncontrado = await this.docenteModel
+        .findOne({ username: username })
+        .exec();
+      if (docenteEncontrado === null) {
+        throw new ErrorFormanderaNotFound(
+          `No existe el usuario con username ${username}`,
         );
       } else return this.docenteToUsuarioDomain(docenteEncontrado);
     } else return this.alumnoToUsuarioDomain(alumnoEncontrado);

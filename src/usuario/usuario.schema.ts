@@ -27,11 +27,17 @@ export class AlumnoMongoModel {
   @Prop({ required: true })
   role: string;
 
+  @Prop({ required: true, type: [String] })
+  comentarios: string[];
+
   @Prop({ required: true })
   metadatos: Metadatos;
 
   @Prop({ required: true, type: [String] })
   turnos: string[];
+
+  @Prop({ required: false })
+  curso_academico: string;
 }
 
 export const AlumnoSchema = SchemaFactory.createForClass(AlumnoMongoModel);
@@ -60,6 +66,9 @@ export class DocenteMongoModel {
 
   @Prop({ required: true })
   role: string;
+
+  @Prop({ required: true, type: [String] })
+  comentarios: string[];
 
   @Prop({ required: true })
   metadatos: Metadatos;
