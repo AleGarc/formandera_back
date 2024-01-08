@@ -11,11 +11,8 @@ import { ValoracionModule } from './valoracion/valoracion.module';
     MongooseModule.forRootAsync({
       useFactory: async () => ({
         uri: `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DB}`,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
       }),
     }),
-
     ClaseModule,
     UsuarioModule,
     AuthModule,
