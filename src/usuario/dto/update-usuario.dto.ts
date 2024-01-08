@@ -7,4 +7,24 @@ export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   @IsNotEmpty()
   @IsString()
   readonly biografia: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  readonly clase: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString({ each: true })
+  readonly asignaturas: string[];
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString({ each: true })
+  readonly experiencia: string[];
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString({ each: true })
+  readonly educacion: string[];
 }

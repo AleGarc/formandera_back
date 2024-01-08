@@ -1,21 +1,15 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Post,
-  Request,
   Res,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { Public } from './public.decorator';
-import { Roles } from './roles.decorator';
-import { Role } from 'src/usuario/roles/role.enum';
 import { Response } from 'express';
 import { ErrorFormanderaNotFound } from 'src/base/error';
 import { SignInDto } from './signin.dto';
@@ -43,12 +37,5 @@ export class AuthController {
       } else if (error instanceof UnauthorizedException)
         response.status(HttpStatus.UNAUTHORIZED).json(error).send();
     }
-  }
-
-  @Roles(Role.Admin)
-  @UseGuards(AuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

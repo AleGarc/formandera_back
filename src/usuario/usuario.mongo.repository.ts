@@ -94,13 +94,22 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
   }
 
   async update(id: string, item: Usuario): Promise<Usuario> {
-    const newUsuario = await this.alumnoModel.findOneAndUpdate(
-      { idPublico: id },
-      item,
-      { new: true },
-    );
-
-    return this.alumnoToUsuarioDomain(newUsuario);
+    let newUsuario: any;
+    if (item.role === Role.Docente) {
+      newUsuario = await this.docenteModel.findOneAndUpdate(
+        { idPublico: id },
+        item,
+        { new: true },
+      );
+      return this.docenteToUsuarioDomain(newUsuario);
+    } else if (item.role === Role.Alumno) {
+      newUsuario = await this.alumnoModel.findOneAndUpdate(
+        { idPublico: id },
+        item,
+        { new: true },
+      );
+      return this.alumnoToUsuarioDomain(newUsuario);
+    }
   }
 
   async delete(id: string): Promise<Usuario> | never {

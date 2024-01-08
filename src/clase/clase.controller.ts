@@ -34,13 +34,32 @@ import { v4 as uuidv4 } from 'uuid';
 export class ClaseController {
   constructor(private readonly claseService: ClaseService) {}
 
-  //quitar esto
-  @Public()
+  @Roles(Role.Docente)
+  @UseGuards(RolesGuard)
   @Post()
-  create(@Body() createClaseDto: CreateClaseDto) {
-    //Meter aqui el servicio de valoraciones y crear una
-    //pasar de dto a dominio
-    return this.claseService.create(createClaseDto);
+  async create(
+    @Res() response: Response,
+    @Body() createClaseDto: CreateClaseDto,
+  ) {
+    try {
+      const clase = new Clase({
+        ...createClaseDto,
+        turnos: [],
+        metadatos: {
+          createdBy: createClaseDto.idProfesor,
+          createdAt: new Date().toISOString(),
+          updatedBy: '',
+          updatedAt: '',
+        },
+      });
+      const nuevaClase = await this.claseService.create(clase);
+      response.status(201).json(new ClaseDto(nuevaClase)).send();
+    } catch (ErrorFormanderaConflict) {
+      response
+        .status(HttpStatus.CONFLICT)
+        .json(ErrorFormanderaConflict.message)
+        .send();
+    }
   }
 
   /*   @Get()

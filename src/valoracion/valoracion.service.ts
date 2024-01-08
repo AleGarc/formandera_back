@@ -17,6 +17,12 @@ export class ValoracionService {
       idPublico: idClase,
       calificacion: 0,
       comentarios: [],
+      metadatos: {
+        createdBy: 'system',
+        createdAt: new Date().toISOString(),
+        updatedBy: '',
+        updatedAt: '',
+      },
     });
     return await this.valoracionRepository.create(nuevaValoracion);
   }

@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   ArrayNotEmpty,
@@ -7,7 +6,6 @@ import {
   IsString,
   Max,
   Min,
-  ValidateNested,
 } from 'class-validator';
 
 export class CreateClaseDto {
@@ -38,13 +36,6 @@ export class CreateClaseDto {
   @ArrayMinSize(1)
   @IsString({ each: true })
   asignaturas: string[];
-
-  @IsNotEmpty()
-  @ArrayNotEmpty()
-  @ArrayMinSize(1)
-  @ValidateNested({ each: true })
-  @Type(() => CreateTurnoDto)
-  turnos: CreateTurnoDto[];
 }
 
 export class CreateTurnoDto {

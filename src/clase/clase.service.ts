@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateClaseDto } from './dto/create-clase.dto';
 import { ClaseRepository } from './clase.repository';
 import { Clase } from './entities/clase.entity';
 import { Turno } from './entities/clase.entity';
@@ -12,30 +11,11 @@ export class ClaseService {
     @Inject(ClaseRepository) private claseRepository: ClaseRepository,
     @Inject(ValoracionService) private valoracionService: ValoracionService,
   ) {}
-  create(createClaseDto: CreateClaseDto) {
-    const turnosDto = createClaseDto.turnos;
-    const turnos = turnosDto.map((turno) => {
-      const nuevoTurno = new Turno({
-        idPublico: uuidv4(),
-        ...turno,
-        idAlumnos: [],
-      });
-      return nuevoTurno;
-    });
-    const clase = new Clase({
-      idPublico: uuidv4(),
-      ...createClaseDto,
-      turnos: turnos,
-      metadatos: {
-        createdBy: createClaseDto.idProfesor,
-        createdAt: new Date().toISOString(),
-        updatedBy: '',
-        updatedAt: '',
-      },
-    });
-    this.claseRepository.create(clase);
-    this.valoracionService.create(clase.idPublico);
-    return clase.idPublico;
+  async create(clase: Clase) {
+    clase.idPublico = uuidv4();
+    await this.claseRepository.create(clase);
+    await this.valoracionService.create(clase.idPublico);
+    return clase;
   }
 
   findAll() {

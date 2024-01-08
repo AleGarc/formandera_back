@@ -5,8 +5,8 @@ import {
 import { Metadatos } from 'src/base/metadatos';
 
 export class Clase {
-  _idDB: string;
-  idPublico: string;
+  _idDB?: string;
+  idPublico?: string;
   nombre: string;
   descripcion: string;
   ubicacion: string;
@@ -177,7 +177,7 @@ export class Clase {
     this.actualizarYOrdenarTurnos(turnoActualizado);
 
     this.metadatos.updatedAt = new Date().toISOString();
-    this.metadatos.updatedBy = this.metadatos.updatedBy;
+    this.metadatos.updatedBy = this.idProfesor;
   }
 
   private insertarEnOrden(turno: Turno) {
@@ -203,7 +203,7 @@ export class Clase {
     this.turnos = this.insertarEnOrden(turno);
 
     this.metadatos.updatedAt = new Date().toISOString();
-    this.metadatos.updatedBy = this.metadatos.updatedBy;
+    this.metadatos.updatedBy = this.idProfesor;
   }
 
   borrarTurno(idTurno: string) {
@@ -221,7 +221,7 @@ export class Clase {
     this.turnos.splice(turnoIndex, 1);
 
     this.metadatos.updatedAt = new Date().toISOString();
-    this.metadatos.updatedBy = this.metadatos.updatedBy;
+    this.metadatos.updatedBy = this.idProfesor;
   }
 }
 

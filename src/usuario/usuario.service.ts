@@ -28,7 +28,7 @@ export class UsuarioService {
   }
 
   async update(id: string, usuarioActualizado: Usuario) {
-    return this.usuarioRepository.update(id, usuarioActualizado);
+    return await this.usuarioRepository.update(id, usuarioActualizado);
   }
 
   findAll() {

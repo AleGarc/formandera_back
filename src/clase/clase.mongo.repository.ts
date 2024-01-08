@@ -3,7 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ClaseMongoModel } from './clase.schema';
 import { Clase } from './entities/clase.entity';
 import { ClaseRepository } from './clase.repository';
-import { ErrorFormanderaNotFound } from 'src/base/error';
+import {
+  ErrorFormanderaConflict,
+  ErrorFormanderaNotFound,
+} from 'src/base/error';
 
 export class ClaseRepositoryMongo extends ClaseRepository {
   constructor(
@@ -14,6 +17,26 @@ export class ClaseRepositoryMongo extends ClaseRepository {
   }
 
   async create(item: Clase): Promise<Clase> {
+    const claseEncontrada = await this.claseModel
+      .findOne({ idPublico: item.idPublico })
+      .exec();
+
+    if (claseEncontrada !== null) {
+      new ErrorFormanderaConflict(
+        `Ya existe una clase con id ${item.idPublico}`,
+      );
+    }
+
+    const claseMismoDocente = await this.claseModel.findOne({
+      idProfesor: item.idProfesor,
+    });
+
+    if (claseMismoDocente !== null) {
+      throw new ErrorFormanderaConflict(
+        `El profesor ya tiene una clase creada`,
+      );
+    }
+
     const createdClaseMongo = await this.claseModel.create(item); // modelo mongoose
     item._idDB = createdClaseMongo._id.toString();
     const newClase = new Clase(item);

@@ -2,6 +2,7 @@ import {
   ErrorFormanderaConflict,
   ErrorFormanderaNotFound,
 } from 'src/base/error';
+import { Metadatos } from 'src/base/metadatos';
 
 //Calificación será un valor calculado en base a los comentarios.
 export class Valoracion {
@@ -9,17 +10,20 @@ export class Valoracion {
   idPublico: string;
   calificacion: number;
   comentarios: Comentario[];
+  metadatos: Metadatos;
 
   constructor({
     _idDB,
     idPublico,
     calificacion,
     comentarios,
+    metadatos,
   }: {
     _idDB?: string;
     idPublico: string;
     calificacion: number;
     comentarios: Comentario[];
+    metadatos: Metadatos;
   }) {
     this._idDB = _idDB;
     this.idPublico = idPublico;
@@ -28,6 +32,7 @@ export class Valoracion {
       calificacion === this.calcularCalificacionMedia()
         ? calificacion
         : this.calcularCalificacionMedia();
+    this.metadatos = metadatos;
   }
 
   private calcularCalificacionMedia(): number {
@@ -57,6 +62,9 @@ export class Valoracion {
       this.comentarios.push(comentario);
       this.calificacion = this.calcularCalificacionMedia();
     }
+
+    this.metadatos.updatedAt = new Date().toISOString();
+    this.metadatos.updatedBy = comentario.idAutor;
   }
 
   //Si NO se encuentra el comentario con el mismo autor se devuelve error.
@@ -75,6 +83,9 @@ export class Valoracion {
         'No existe un comentario de este usuario',
       );
     }
+
+    this.metadatos.updatedAt = new Date().toISOString();
+    this.metadatos.updatedBy = comentario.idAutor;
   }
 
   //Si NO se encuentra el comentario con el mismo autor se devuelve error.
@@ -93,6 +104,8 @@ export class Valoracion {
         'No existe un comentario de este usuario',
       );
     }
+    this.metadatos.updatedAt = new Date().toISOString();
+    this.metadatos.updatedBy = idAutor;
   }
 }
 
