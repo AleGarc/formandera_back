@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UsuarioRepository } from './usuario.repository';
-import { Alumno, Usuario } from './entities/usuario.entity';
+import { Alumno, Docente, Usuario } from './entities/usuario.entity';
 import * as bcrypt from 'bcrypt';
+import { QueryEntidad } from './entities/query.entity';
 
 export type User = any;
 
@@ -14,6 +15,34 @@ export class UsuarioService {
 
   findOne(id: string) {
     return this.usuarioRepository.get(id);
+  }
+
+  async findByQuery(queryEntidad: QueryEntidad) {
+    const usuarios = await this.usuarioRepository.getByQuery(queryEntidad);
+
+    const palabrasClave = queryEntidad.keyword
+      .toLowerCase()
+      .split(' ')
+      .filter((palabra) => palabra.length > 0);
+    if (palabrasClave.length === 0) return usuarios;
+    else {
+      const usuariosFiltrados = usuarios.filter((usuario) => {
+        if (usuario instanceof Docente) {
+          const propiedades = [
+            usuario.nombre,
+            usuario.username,
+            usuario.biografia ?? '',
+            ...(usuario.educacion ?? []),
+            ...(usuario.experiencia ?? []),
+            ...(usuario.asignaturas ?? []),
+          ].map((propiedad) => propiedad.toLowerCase());
+          return palabrasClave.some((palabra) =>
+            propiedades.some((propiedad) => propiedad.includes(palabra)),
+          );
+        }
+      });
+      return usuariosFiltrados;
+    }
   }
 
   findByUsername(username: string) {

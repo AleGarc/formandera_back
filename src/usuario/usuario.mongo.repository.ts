@@ -9,6 +9,7 @@ import {
   ErrorFormanderaConflict,
   ErrorFormanderaNotFound,
 } from 'src/base/error';
+import { QueryEntidad } from './entities/query.entity';
 
 export class UsuarioRepositoryMongo extends UsuarioRepository {
   constructor(
@@ -83,6 +84,32 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
         throw new ErrorFormanderaNotFound(`No existe el usuario con id ${id}`);
       else return this.docenteToUsuarioDomain(docenteMongo);
     } else return this.alumnoToUsuarioDomain(alumnoMongo);
+  }
+
+  async getByQuery(queryEntidad: QueryEntidad): Promise<Usuario[]> {
+    const filtroAsignaturas =
+      queryEntidad.asignaturas.length > 0
+        ? { asignaturas: { $in: queryEntidad.asignaturas } }
+        : { asignaturas: { $exists: true } };
+
+    if (queryEntidad.tipo === Role.Docente) {
+      const docentesMongo = await this.docenteModel
+        .find(
+          {
+            ...filtroAsignaturas,
+          },
+          null,
+          { limit: queryEntidad.take, skip: queryEntidad.skip },
+        )
+        .exec();
+
+      return docentesMongo.map((docenteMongo) =>
+        this.docenteToUsuarioDomain(docenteMongo),
+      );
+    } else
+      return (await this.docenteModel.find().exec()).map((docenteMongo) =>
+        this.docenteToUsuarioDomain(docenteMongo),
+      );
   }
 
   async getAll(): Promise<Usuario[]> {

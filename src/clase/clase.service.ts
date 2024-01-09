@@ -5,6 +5,7 @@ import { Turno } from './entities/clase.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ValoracionService } from 'src/valoracion/valoracion.service';
 import { UsuarioService } from 'src/usuario/usuario.service';
+import { QueryEntidad } from './entities/query.entity';
 
 @Injectable()
 export class ClaseService {
@@ -21,7 +22,31 @@ export class ClaseService {
   }
 
   findAll() {
-    return `This action returns all clase`;
+    return this.claseRepository.getAll();
+  }
+
+  async findByQuery(queryEntidad: QueryEntidad) {
+    const clases = await this.claseRepository.getByQuery(queryEntidad);
+
+    const palabrasClave = queryEntidad.keyword
+      .toLowerCase()
+      .split(' ')
+      .filter((palabra) => palabra.length > 0);
+    if (palabrasClave.length === 0) return clases;
+    else {
+      const clasesFiltradas = clases.filter((clase) => {
+        const propiedades = [
+          clase.nombre,
+          clase.descripcion,
+          clase.ubicacion,
+          ...clase.asignaturas,
+        ].map((propiedad) => propiedad.toLowerCase());
+        return palabrasClave.some((palabra) =>
+          propiedades.some((propiedad) => propiedad.includes(palabra)),
+        );
+      });
+      return clasesFiltradas;
+    }
   }
 
   async findOne(id: string) {

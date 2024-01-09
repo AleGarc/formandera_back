@@ -11,6 +11,7 @@ import {
   Res,
   ConflictException,
   Request,
+  Query,
 } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -30,6 +31,8 @@ import {
   ErrorFormanderaNotFound,
   ErrorFormanderaUnauthorized,
 } from 'src/base/error';
+import { QueryStringDto } from './dto/query-string.dto';
+import { QueryEntidad } from './entities/query.entity';
 
 @Controller('usuario')
 export class UsuarioController {
@@ -58,10 +61,20 @@ export class UsuarioController {
 
   @Public()
   @Get()
-  async findAll() {
-    const usuarios = await this.usuarioService.findAll();
-    const resultados = usuarios.map((usuario) => new UsuarioDto(usuario));
-    return { data: resultados };
+  async findAll(@Query() queryStringDto: QueryStringDto) {
+    if (Object.keys(queryStringDto).length === 0)
+      return {
+        data: (await this.usuarioService.findAll()).map(
+          (usuario) => new UsuarioDto(usuario),
+        ),
+      };
+    const queryEntidad: QueryEntidad = new QueryEntidad(queryStringDto);
+    return {
+      data: (await this.usuarioService.findByQuery(queryEntidad)).map(
+        (usuario) => new UsuarioDto(usuario),
+      ),
+      pagination: { take: queryEntidad.take, skip: queryEntidad.skip },
+    };
   }
 
   @Public()

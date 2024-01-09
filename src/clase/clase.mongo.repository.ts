@@ -7,6 +7,7 @@ import {
   ErrorFormanderaConflict,
   ErrorFormanderaNotFound,
 } from 'src/base/error';
+import { QueryEntidad } from './entities/query.entity';
 
 export class ClaseRepositoryMongo extends ClaseRepository {
   constructor(
@@ -58,6 +59,29 @@ export class ClaseRepositoryMongo extends ClaseRepository {
     if (claseMongo === null)
       throw new ErrorFormanderaNotFound(`No existe la clase con id ${id}`);
     else return this.toClaseDomain(claseMongo);
+  }
+
+  async getByQuery(queryEntidad: QueryEntidad): Promise<Clase[]> {
+    const filtroAsignaturas =
+      queryEntidad.asignaturas.length > 0
+        ? { asignaturas: { $in: queryEntidad.asignaturas } }
+        : { asignaturas: { $exists: true } };
+
+    const clasesMongo = await this.claseModel
+      .find(
+        {
+          ...filtroAsignaturas,
+          precio: {
+            $gte: queryEntidad.precioMin,
+            $lte: queryEntidad.precioMax,
+          },
+        },
+        null,
+        { limit: queryEntidad.take, skip: queryEntidad.skip },
+      )
+      .exec();
+
+    return clasesMongo.map((claseMongo) => this.toClaseDomain(claseMongo));
   }
 
   async getAll(): Promise<Clase[]> {

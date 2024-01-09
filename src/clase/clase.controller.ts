@@ -13,6 +13,7 @@ import {
   UseGuards,
   Request,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ClaseService } from './clase.service';
 import { CreateClaseDto, CreateTurnoDto } from './dto/create-clase.dto';
@@ -31,13 +32,16 @@ import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/usuario/roles/role.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { v4 as uuidv4 } from 'uuid';
+import { QueryStringDto } from './dto/query-string.dto';
+import { QueryEntidad } from './entities/query.entity';
 
 @Controller('clase')
 export class ClaseController {
   constructor(private readonly claseService: ClaseService) {}
 
-  @Roles(Role.Docente)
-  @UseGuards(RolesGuard)
+  /*  @Roles(Role.Docente)
+  @UseGuards(RolesGuard) */
+  @Public()
   @Post()
   async create(
     @Res() response: Response,
@@ -66,10 +70,23 @@ export class ClaseController {
     }
   }
 
-  /*   @Get()
-  findAll() {
-    return this.claseService.findAll();
-  } */
+  @Public()
+  @Get()
+  async findAll(@Query() queryStringDto: QueryStringDto) {
+    if (Object.keys(queryStringDto).length === 0)
+      return {
+        data: (await this.claseService.findAll()).map(
+          (clase) => new ClaseDto(clase),
+        ),
+      };
+    const queryEntidad: QueryEntidad = new QueryEntidad(queryStringDto);
+    return {
+      data: (await this.claseService.findByQuery(queryEntidad)).map(
+        (clase) => new ClaseDto(clase),
+      ),
+      pagination: { take: queryEntidad.take, skip: queryEntidad.skip },
+    };
+  }
 
   @Public()
   @Get(':id')
