@@ -180,4 +180,23 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
       } else return this.docenteToUsuarioDomain(docenteEncontrado);
     } else return this.alumnoToUsuarioDomain(alumnoEncontrado);
   }
+
+  async getByComentario(idComentario: string): Promise<Usuario[]> {
+    const alumnosMongo = await this.alumnoModel
+      .find({ comentarios: { $in: [idComentario] } })
+      .exec();
+    const docentesMongo = await this.docenteModel
+      .find({ comentarios: { $in: [idComentario] } })
+      .exec();
+
+    const alumnos = alumnosMongo.map((alumnoMongo) =>
+      this.alumnoToUsuarioDomain(alumnoMongo),
+    );
+    const docentes = docentesMongo.map((docenteMongo) =>
+      this.docenteToUsuarioDomain(docenteMongo),
+    );
+
+    const usuarios = alumnos.concat(docentes);
+    return usuarios;
+  }
 }

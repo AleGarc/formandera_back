@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Comentario, Valoracion } from './entities/valoracion.entity';
 import { ValoracionRepository } from './valoracion.repository';
+import { ErrorFormanderaNotFound } from 'src/base/error';
 
 @Injectable()
 export class ValoracionService {
@@ -29,6 +30,18 @@ export class ValoracionService {
 
   async findOne(id: string) {
     return await this.valoracionRepository.get(id);
+  }
+
+  async findByAutor(id: string, idAutor: string) {
+    const valoracion = await this.valoracionRepository.get(id);
+    const comentario = valoracion.comentarios.find(
+      (comentario) => comentario.idAutor === idAutor,
+    );
+    if (comentario === undefined)
+      throw new ErrorFormanderaNotFound(
+        `No existe ningún comentario con idAutor ${idAutor}`,
+      );
+    return comentario;
   }
 
   async agregarComentario(

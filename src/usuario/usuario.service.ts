@@ -91,4 +91,12 @@ export class UsuarioService {
     usuario.eliminarComentario(idComentario);
     return await this.usuarioRepository.update(idUsuario, usuario);
   }
+
+  async borrarTodosComentarios(idComentario: string) {
+    this.usuarioRepository.getByComentario(idComentario).then((usuarios) => {
+      usuarios.forEach((usuario) => {
+        this.borrarComentario(usuario.idPublico, idComentario);
+      });
+    });
+  }
 }

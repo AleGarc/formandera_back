@@ -53,6 +53,10 @@ export class ClaseService {
     return await this.claseRepository.get(id);
   }
 
+  async findByAlumno(idAlumno: string) {
+    return await this.claseRepository.getByAlumno(idAlumno);
+  }
+
   async update(id: string, clase: Clase) {
     const claseDB = await this.claseRepository.get(id);
     claseDB.modificarClase(clase);
@@ -63,6 +67,7 @@ export class ClaseService {
   async remove(id: string) {
     await this.claseRepository.delete(id);
     await this.valoracionService.remove(id);
+    await this.usuarioService.borrarTodosComentarios(id);
   }
 
   async apuntarAlumno(

@@ -6,4 +6,5 @@ export abstract class UsuarioRepository extends IGenericRepository<Usuario> {
   abstract getByEmail(email: string): Promise<Usuario>;
   abstract getByUsername(username: string): Promise<Usuario>;
   abstract getByQuery(queryEntidad: QueryEntidad): Promise<Usuario[]>;
+  abstract getByComentario(idComentario: string): Promise<Usuario[]>;
 }

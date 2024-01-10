@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { ValoracionService } from './valoracion.service';
 import { Response } from 'express';
-import { ValoracionDto } from './dto/valoracion.dto';
+import { ComentarioDto, ValoracionDto } from './dto/valoracion.dto';
 import { Public } from 'src/auth/public.decorator';
 import { CreateComentarioDto } from './dto/create-valoracion.dto';
 import { Comentario } from './entities/valoracion.entity';
@@ -36,6 +36,26 @@ export class ValoracionController {
     try {
       const valoracion = await this.valoracionService.findOne(id);
       response.status(HttpStatus.OK).json(new ValoracionDto(valoracion)).send();
+      return;
+    } catch (error) {
+      if (error instanceof ErrorFormanderaNotFound) {
+        response.status(HttpStatus.NOT_FOUND).json(error.message).send();
+        return;
+      }
+    }
+  }
+
+  //Búsqueda del comentario por el id del autor.
+  @Public()
+  @Get(':id/autor/:idAutor')
+  async findByAutor(
+    @Res() response: Response,
+    @Param('id') id: string,
+    @Param('idAutor') idAutor: string,
+  ) {
+    try {
+      const comentario = await this.valoracionService.findByAutor(id, idAutor);
+      response.status(HttpStatus.OK).json(new ComentarioDto(comentario)).send();
       return;
     } catch (error) {
       if (error instanceof ErrorFormanderaNotFound) {

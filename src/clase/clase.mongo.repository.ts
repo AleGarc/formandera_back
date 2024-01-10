@@ -61,6 +61,22 @@ export class ClaseRepositoryMongo extends ClaseRepository {
     else return this.toClaseDomain(claseMongo);
   }
 
+  async getByAlumno(idAlumno: string): Promise<Clase[]> {
+    const clasesMongo = await this.claseModel.find({
+      turnos: {
+        $elemMatch: {
+          idAlumnos: idAlumno,
+        },
+      },
+    });
+    if (clasesMongo.length === 0)
+      throw new ErrorFormanderaNotFound(
+        `No existen clases con alumnos apuntados con id ${idAlumno}`,
+      );
+    else
+      return clasesMongo.map((clasesMongo) => this.toClaseDomain(clasesMongo));
+  }
+
   async getByQuery(queryEntidad: QueryEntidad): Promise<Clase[]> {
     const filtroAsignaturas =
       queryEntidad.asignaturas.length > 0

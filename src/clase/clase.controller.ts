@@ -102,6 +102,39 @@ export class ClaseController {
       }
     }
   }
+  /* 
+  @Public()
+  @Get('turnos/:idTurno')
+  async findOneTurno(@Res() response: Response, @Param('idTurno') id: string) {
+    try {
+      const clase = await this.claseService.findOneTurno(id);
+      response.status(200).json(new ClaseDto(clase)).send();
+      return;
+    } catch (error) {
+      if (error instanceof ErrorFormanderaNotFound) {
+        response.status(HttpStatus.NOT_FOUND).json(error.message).send();
+        return;
+      }
+    }
+  } */
+
+  @Public()
+  @Get('turnos/:idAlumno')
+  async findByAlumno(@Res() response: Response, @Param('idAlumno') id: string) {
+    try {
+      const clases = await this.claseService.findByAlumno(id);
+      response
+        .status(200)
+        .json(clases.map((clase) => new ClaseDto(clase)))
+        .send();
+      return;
+    } catch (error) {
+      if (error instanceof ErrorFormanderaNotFound) {
+        response.status(HttpStatus.NOT_FOUND).json(error.message).send();
+        return;
+      }
+    }
+  }
 
   @Roles(Role.Docente)
   @UseGuards(RolesGuard)
