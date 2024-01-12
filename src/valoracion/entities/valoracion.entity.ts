@@ -8,29 +8,29 @@ import { Metadatos } from 'src/base/metadatos';
 export class Valoracion {
   _idDB?: string;
   idPublico: string;
-  calificacion: number;
+  puntuacion: number;
   comentarios: Comentario[];
   metadatos: Metadatos;
 
   constructor({
     _idDB,
     idPublico,
-    calificacion,
+    puntuacion,
     comentarios,
     metadatos,
   }: {
     _idDB?: string;
     idPublico: string;
-    calificacion: number;
+    puntuacion: number;
     comentarios: Comentario[];
     metadatos: Metadatos;
   }) {
     this._idDB = _idDB;
     this.idPublico = idPublico;
     this.comentarios = comentarios;
-    this.calificacion =
-      calificacion === this.calcularCalificacionMedia()
-        ? calificacion
+    this.puntuacion =
+      puntuacion === this.calcularCalificacionMedia()
+        ? puntuacion
         : this.calcularCalificacionMedia();
     this.metadatos = metadatos;
   }
@@ -60,7 +60,7 @@ export class Valoracion {
       );
     } else {
       this.comentarios.push(comentario);
-      this.calificacion = this.calcularCalificacionMedia();
+      this.puntuacion = this.calcularCalificacionMedia();
     }
 
     this.metadatos.updatedAt = new Date().toISOString();
@@ -77,7 +77,7 @@ export class Valoracion {
       this.comentarios = this.comentarios.map((com) =>
         com.idAutor === comentario.idAutor ? comentario : com,
       );
-      this.calificacion = this.calcularCalificacionMedia();
+      this.puntuacion = this.calcularCalificacionMedia();
     } else {
       throw new ErrorFormanderaNotFound(
         'No existe un comentario de este usuario',
@@ -98,7 +98,7 @@ export class Valoracion {
       this.comentarios = this.comentarios.filter(
         (com) => com.idAutor !== idAutor,
       );
-      this.calificacion = this.calcularCalificacionMedia();
+      this.puntuacion = this.calcularCalificacionMedia();
     } else {
       throw new ErrorFormanderaNotFound(
         'No existe un comentario de este usuario',

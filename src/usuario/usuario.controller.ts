@@ -23,7 +23,6 @@ import {
   Usuario,
   crearUsuario,
 } from './entities/usuario.entity';
-import { v4 as uuidv4 } from 'uuid';
 import { UsuarioDto } from './dto/usuario.dto';
 import { Response } from 'express';
 import {
@@ -44,16 +43,16 @@ export class UsuarioController {
     @Res() response: Response,
     @Body() createUsuarioDto: CreateUsuarioDto,
   ) {
-    const idPublico = uuidv4();
-    const nuevoUsuario = crearUsuario(idPublico, createUsuarioDto);
+    const nuevoUsuario = crearUsuario(createUsuarioDto);
     try {
       const usuarioCreado = await this.usuarioService.create(nuevoUsuario);
       response.status(HttpStatus.CREATED).json(usuarioCreado.idPublico).send();
       return;
     } catch (ErrorFormanderaConflict) {
+      console.log(ErrorFormanderaConflict.message);
       response
         .status(HttpStatus.CONFLICT)
-        .json(new ConflictException(ErrorFormanderaConflict.message))
+        .json(ErrorFormanderaConflict.message)
         .send();
       return;
     }
@@ -87,40 +86,6 @@ export class UsuarioController {
     } catch (ErrorFormanderaNotFound) {
       response.status(HttpStatus.NOT_FOUND).send();
       return;
-    }
-  }
-
-  @Public()
-  @Get('/email/:email')
-  async findOneByEmail(
-    @Res() response: Response,
-    @Param('email') email: string,
-  ) {
-    try {
-      await this.usuarioService.findByEmail(email);
-      response.status(HttpStatus.OK).send();
-      return;
-    } catch (ErrorFormanderaNotFound) {
-      response.status(HttpStatus.NOT_FOUND).send();
-      return;
-    }
-  }
-
-  @Public()
-  @Get('/username/:username')
-  async findOneByUsername(
-    @Res() response: Response,
-    @Param('username') username: string,
-  ) {
-    try {
-      await this.usuarioService.findByUsername(username);
-      response.status(HttpStatus.OK).send();
-      return;
-    } catch (error) {
-      if (error instanceof ErrorFormanderaNotFound) {
-        response.status(HttpStatus.NOT_FOUND).json(error.message).send();
-        return;
-      }
     }
   }
 
@@ -197,6 +162,13 @@ export class UsuarioController {
       if (error instanceof ErrorFormanderaUnauthorized) {
         response
           .status(HttpStatus.UNAUTHORIZED)
+          .json(new ConflictException(error.message))
+          .send();
+        return;
+      }
+      if (error instanceof ErrorFormanderaConflict) {
+        response
+          .status(HttpStatus.CONFLICT)
           .json(new ConflictException(error.message))
           .send();
         return;

@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UsuarioRepository } from './usuario.repository';
 import { Alumno, Docente, Usuario } from './entities/usuario.entity';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 import { QueryEntidad } from './entities/query.entity';
 
 export type User = any;
@@ -13,8 +14,14 @@ export class UsuarioService {
     private usuarioRepository: UsuarioRepository,
   ) {}
 
-  findOne(id: string) {
-    return this.usuarioRepository.get(id);
+  async create(nuevoUsuario: Usuario) {
+    const idPublico = uuidv4();
+    nuevoUsuario.idPublico = idPublico;
+    nuevoUsuario.metadatos.createdBy = idPublico;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(nuevoUsuario.password, saltRounds);
+    nuevoUsuario.password = hashedPassword;
+    return this.usuarioRepository.create(nuevoUsuario);
   }
 
   async findByQuery(queryEntidad: QueryEntidad) {
@@ -45,19 +52,12 @@ export class UsuarioService {
     }
   }
 
-  findByUsername(username: string) {
-    return this.usuarioRepository.getByUsername(username);
+  findOne(id: string) {
+    return this.usuarioRepository.get(id);
   }
 
   findByEmail(email: string) {
     return this.usuarioRepository.getByEmail(email);
-  }
-
-  async create(nuevoUsuario: Usuario) {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(nuevoUsuario.password, saltRounds);
-    nuevoUsuario.password = hashedPassword;
-    return this.usuarioRepository.create(nuevoUsuario);
   }
 
   async update(id: string, usuarioActualizado: Usuario) {

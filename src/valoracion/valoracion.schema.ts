@@ -11,7 +11,7 @@ export class ValoracionMongoModel {
   idPublico: string;
 
   @Prop({ required: true })
-  calificacion: number;
+  puntuacion: number;
 
   @Prop({ required: true, type: [Comentario] })
   comentarios: Comentario[];

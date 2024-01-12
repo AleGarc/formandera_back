@@ -2,20 +2,20 @@ import { Comentario } from '../entities/valoracion.entity';
 
 export class ValoracionDto {
   idPublico: string;
-  calificacion: number;
+  puntuacion: number;
   comentarios: ComentarioDto[];
 
   constructor({
     idPublico,
-    calificacion,
+    puntuacion,
     comentarios,
   }: {
     idPublico: string;
-    calificacion: number;
+    puntuacion: number;
     comentarios: Comentario[];
   }) {
     this.idPublico = idPublico;
-    this.calificacion = calificacion;
+    this.puntuacion = puntuacion;
     this.comentarios = comentarios.map((comentario) => {
       return new ComentarioDto(comentario);
     });

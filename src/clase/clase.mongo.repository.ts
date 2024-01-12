@@ -1,6 +1,6 @@
-import { HydratedDocument, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClaseMongoModel } from './clase.schema';
+import { ClaseDocument, ClaseMongoModel } from './clase.schema';
 import { Clase } from './entities/clase.entity';
 import { ClaseRepository } from './clase.repository';
 import {
@@ -44,7 +44,7 @@ export class ClaseRepositoryMongo extends ClaseRepository {
     return newClase;
   }
 
-  private toClaseDomain(claseMongo: HydratedDocument<ClaseMongoModel>): Clase {
+  private toClaseDomain(claseMongo: ClaseDocument): Clase {
     if (claseMongo) {
       const clase = new Clase({
         _idDB: claseMongo._id.toString(),

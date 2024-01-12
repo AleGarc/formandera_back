@@ -173,17 +173,16 @@ export class Docente extends Usuario {
 }
 
 export function crearUsuario(
-  idPublico: string,
   createUsuarioDto: CreateUsuarioDto,
 ): Alumno | Docente | null {
   switch (createUsuarioDto.role) {
     case 'alumno': {
       const props = createUsuarioDto as AlumnoProps;
       return new Alumno({
-        idPublico: idPublico,
+        idPublico: undefined,
         ...props,
         metadatos: {
-          createdBy: idPublico,
+          createdBy: undefined,
           createdAt: new Date().toISOString(),
           updatedBy: '',
           updatedAt: '',
@@ -197,10 +196,10 @@ export function crearUsuario(
     case 'docente': {
       const props = createUsuarioDto as DocenteProps;
       return new Docente({
-        idPublico: idPublico,
+        idPublico: undefined,
         ...props,
         metadatos: {
-          createdBy: idPublico,
+          createdBy: undefined,
           createdAt: new Date().toISOString(),
           updatedBy: '',
           updatedAt: '',

@@ -14,6 +14,7 @@ export class ClaseService {
     @Inject(ValoracionService) private valoracionService: ValoracionService,
     @Inject(UsuarioService) private usuarioService: UsuarioService,
   ) {}
+
   async create(clase: Clase) {
     clase.idPublico = uuidv4();
     await this.claseRepository.create(clase);

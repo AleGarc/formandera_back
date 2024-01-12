@@ -39,9 +39,8 @@ import { QueryEntidad } from './entities/query.entity';
 export class ClaseController {
   constructor(private readonly claseService: ClaseService) {}
 
-  /*  @Roles(Role.Docente)
-  @UseGuards(RolesGuard) */
-  @Public()
+  @Roles(Role.Docente)
+  @UseGuards(RolesGuard)
   @Post()
   async create(
     @Res() response: Response,
@@ -102,21 +101,6 @@ export class ClaseController {
       }
     }
   }
-  /* 
-  @Public()
-  @Get('turnos/:idTurno')
-  async findOneTurno(@Res() response: Response, @Param('idTurno') id: string) {
-    try {
-      const clase = await this.claseService.findOneTurno(id);
-      response.status(200).json(new ClaseDto(clase)).send();
-      return;
-    } catch (error) {
-      if (error instanceof ErrorFormanderaNotFound) {
-        response.status(HttpStatus.NOT_FOUND).json(error.message).send();
-        return;
-      }
-    }
-  } */
 
   @Public()
   @Get('turnos/:idAlumno')
@@ -140,11 +124,19 @@ export class ClaseController {
   @UseGuards(RolesGuard)
   @Patch(':id')
   async update(
+    @Request() req,
     @Res() response: Response,
     @Param('id') id: string,
     @Body() updateClaseDto: UpdateClaseDto,
   ) {
     try {
+      const claseDB = await this.claseService.findOne(id);
+      //Comparación del id del usuario logueado con el id del autor del comentario.
+      if (req.user.idPublico !== claseDB.idProfesor)
+        throw new ErrorFormanderaUnauthorized(
+          'No eres el usuario autor de esta cuenta',
+        );
+
       const clase = new Clase({
         idPublico: id,
         nombre: updateClaseDto.nombre,

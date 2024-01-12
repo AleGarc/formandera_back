@@ -1,6 +1,11 @@
-import { HydratedDocument, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { AlumnoMongoModel, DocenteMongoModel } from './usuario.schema';
+import {
+  AlumnoDocument,
+  AlumnoMongoModel,
+  DocenteDocument,
+  DocenteMongoModel,
+} from './usuario.schema';
 import { UsuarioRepository } from './usuario.repository';
 import { Alumno, Docente, Usuario } from './entities/usuario.entity';
 import { Role } from './roles/role.enum';
@@ -22,14 +27,25 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
   }
 
   async create(item: Usuario): Promise<Usuario> {
-    const usuarioEncontrado = await this.alumnoModel
-      .findOne({ email: item.email })
-      .exec();
-    if (usuarioEncontrado !== null) {
+    //Comprobación de que no exista un usuario con el mismo email o username
+    let usuarioEmail = undefined;
+    try {
+      usuarioEmail = await this.getByEmail(item.email);
+    } catch (ErrorFormanderaNotFound) {}
+    if (usuarioEmail)
       throw new ErrorFormanderaConflict(
         `Ya existe un usuario con email ${item.email}`,
       );
-    }
+
+    let usuarioUsername = undefined;
+    try {
+      usuarioUsername = await this.getByUsername(item.username);
+    } catch (ErrorFormanderaNotFound) {}
+    if (usuarioUsername)
+      throw new ErrorFormanderaConflict(
+        `Ya existe un usuario con username ${item.username}`,
+      );
+
     let createdUsuarioMongo: any;
     switch (item.role) {
       case Role.Alumno: {
@@ -48,9 +64,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     const newUsuario = new Usuario(item);
     return newUsuario;
   }
-  private alumnoToUsuarioDomain(
-    alumnoMongo: HydratedDocument<AlumnoMongoModel>,
-  ): Usuario {
+  private alumnoToUsuarioDomain(alumnoMongo: AlumnoDocument): Usuario {
     if (alumnoMongo) {
       const alumno = new Alumno({
         _idDB: alumnoMongo._id.toString(),
@@ -60,9 +74,7 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     }
   }
 
-  private docenteToUsuarioDomain(
-    docenteMongo: HydratedDocument<DocenteMongoModel>,
-  ): Usuario {
+  private docenteToUsuarioDomain(docenteMongo: DocenteDocument): Usuario {
     if (docenteMongo) {
       const docente = new Docente({
         _idDB: docenteMongo._id.toString(),
@@ -121,6 +133,27 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
   }
 
   async update(id: string, item: Usuario): Promise<Usuario> {
+    //Comprobación de que no exista un usuario con el mismo email o username
+    let usuarioEmail = undefined;
+    try {
+      usuarioEmail = await this.getByEmail(item.email);
+      console.log(usuarioEmail);
+    } catch (ErrorFormanderaNotFound) {}
+    if (usuarioEmail && usuarioEmail.idPublico !== id)
+      throw new ErrorFormanderaConflict(
+        `Ya existe un usuario con email ${item.email}`,
+      );
+
+    let usuarioUsername = undefined;
+    try {
+      usuarioUsername = await this.getByUsername(item.username);
+      console.log(usuarioUsername);
+    } catch (ErrorFormanderaNotFound) {}
+    if (usuarioUsername && usuarioUsername.idPublico !== id)
+      throw new ErrorFormanderaConflict(
+        `Ya existe un usuario con username ${item.username}`,
+      );
+
     let newUsuario: any;
     if (item.role === Role.Docente) {
       newUsuario = await this.docenteModel.findOneAndUpdate(

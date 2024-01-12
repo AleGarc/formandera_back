@@ -16,7 +16,7 @@ export class ValoracionService {
   async create(idClase: string) {
     const nuevaValoracion = new Valoracion({
       idPublico: idClase,
-      calificacion: 0,
+      puntuacion: 0,
       comentarios: [],
       metadatos: {
         createdBy: 'system',

@@ -9,16 +9,12 @@ export class QueryEntidad {
     keyword,
     tipo,
     asignaturas,
-    precioMin,
-    precioMax,
     take,
     skip,
   }: {
     keyword?: string;
     tipo?: string;
     asignaturas?: string[];
-    precioMin?: number;
-    precioMax?: number;
     take?: number;
     skip?: number;
   }) {

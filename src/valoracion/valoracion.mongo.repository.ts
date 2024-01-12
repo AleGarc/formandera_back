@@ -1,4 +1,4 @@
-import { HydratedDocument, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { ValoracionRepository } from './valoracion.repository';
@@ -7,7 +7,7 @@ import {
   ErrorFormanderaConflict,
   ErrorFormanderaNotFound,
 } from 'src/base/error';
-import { ValoracionMongoModel } from './valoracion.schema';
+import { ValoracionDocument, ValoracionMongoModel } from './valoracion.schema';
 import { Valoracion } from './entities/valoracion.entity';
 
 export class ValoracionRepositoryMongo extends ValoracionRepository {
@@ -38,9 +38,7 @@ export class ValoracionRepositoryMongo extends ValoracionRepository {
   }
 
   //Mapper de objetos de mongodb a objetos de dominio.
-  private valoracionToDomain(
-    valoracionMongo: HydratedDocument<ValoracionMongoModel>,
-  ): Valoracion {
+  private valoracionToDomain(valoracionMongo: ValoracionDocument): Valoracion {
     if (valoracionMongo) {
       const valoracion = new Valoracion({
         _idDB: valoracionMongo._id.toString(),
