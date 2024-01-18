@@ -137,7 +137,6 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     let usuarioEmail = undefined;
     try {
       usuarioEmail = await this.getByEmail(item.email);
-      console.log(usuarioEmail);
     } catch (ErrorFormanderaNotFound) {}
     if (usuarioEmail && usuarioEmail.idPublico !== id)
       throw new ErrorFormanderaConflict(
@@ -147,7 +146,6 @@ export class UsuarioRepositoryMongo extends UsuarioRepository {
     let usuarioUsername = undefined;
     try {
       usuarioUsername = await this.getByUsername(item.username);
-      console.log(usuarioUsername);
     } catch (ErrorFormanderaNotFound) {}
     if (usuarioUsername && usuarioUsername.idPublico !== id)
       throw new ErrorFormanderaConflict(

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  formandera_frontend_react:
+    build:
+      context: ../formandera_front
+      args:
+        - REACT_APP_HOST=localhost
+        - REACT_APP_PORT=3000
+        - REACT_APP_API_HOST=localhost
+        - REACT_APP_API_PORT=3001
+    ports:
+      - '3000:3000'
+    command: http-server-spa ./build index.html 3000
+    depends_on:
+      - formandera_backend_nestjs
+
+  formandera_backend_nestjs:
+    build:
+      context: .
+      args:
+        - PORT=3001
+        - MONGO_HOST=formandera_mongodb
+        - MONGO_PORT=27017
+        - MONGO_DB=formandera
+        - MONGO_ENTITIES_REGEX=dist/infraestructure/persistence/mongoose/schemas/*.schema{.ts,.js}
+        - JWT_SECRET=AISJDIJQWI1247298374s8df8sd8sdf23
+    ports:
+      - '3001:3001'
+    command: npm run start:prod
+    depends_on:
+      - formandera_mongodb
+
+  formandera_mongodb:
+    image: mongo:latest
+    container_name: formandera_mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:

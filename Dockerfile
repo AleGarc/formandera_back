@@ -1,0 +1,26 @@
+FROM node:18-alpine
+
+WORKDIR /formandera_back_nestjs
+
+COPY  package.json package-lock.json /formandera_back_nestjs/
+RUN npm ci
+
+COPY . /formandera_back_nestjs/
+
+ARG PORT
+ENV PORT $PORT
+ARG MONGO_HOST
+ENV MONGO_HOST $MONGO_HOST
+ARG MONGO_PORT
+ENV MONGO_PORT $MONGO_PORT
+ARG MONGO_DB
+ENV MONGO_DB $MONGO_DB
+ARG MONGO_ENTITIES_REGEX
+ENV MONGO_ENTITIES_REGEX $MONGO_ENTITIES_REGEX
+ARG JWT_SECRET
+ENV JWT_SECRET $JWT_SECRET
+
+
+
+
+
