@@ -1,7 +1,14 @@
 version: '3.8'
 
+networks:
+  formandera_network:
+    driver: bridge
+  formandera_back_db_network:
+    driver: bridge
+
 services:
   formandera_frontend_react:
+    container_name: formandera_frontend_react
     build:
       context: ../formandera_front
       args:
@@ -14,8 +21,11 @@ services:
     command: http-server-spa ./build index.html 3000
     depends_on:
       - formandera_backend_nestjs
+    networks:
+      - formandera_network
 
   formandera_backend_nestjs:
+    container_name: formandera_backend_nestjs
     build:
       context: .
       args:
@@ -30,6 +40,9 @@ services:
     command: npm run start:prod
     depends_on:
       - formandera_mongodb
+    networks:
+      - formandera_network
+      - formandera_back_db_network
 
   formandera_mongodb:
     image: mongo:latest
@@ -38,6 +51,8 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - formandera_back_db_network
 
 volumes:
   mongodb_data:

@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 WORKDIR /formandera_back_nestjs
 
-COPY  package.json package-lock.json /formandera_back_nestjs/
+COPY package.json package-lock.json /formandera_back_nestjs/
 RUN npm ci
 
 COPY . /formandera_back_nestjs/

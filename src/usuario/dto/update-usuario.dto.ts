@@ -8,7 +8,6 @@ export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   readonly biografia: string;
 
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
   readonly curso_academico: string;
 
